@@ -1,14 +1,18 @@
-from queue import Empty
+import json
 import socket
 import threading
-import pyodbc
 HOST = "127.0.0.1"
-SERVER_PORT = 65432
+SERVER_PORT = 63000
 FORMAT = "utf8"
 
 LIST = 'list'
 LOGIN = 'login'
-
+FAIL = 'fail'
+SUCCESS = 'Successfull'
+SIGNUP = 'signup'
+INVALID = 'invalid'
+with open("accounts.json","r") as f:
+    content = json.load(f)
 
 def recvList(conn):
     list = []
@@ -19,51 +23,33 @@ def recvList(conn):
         item = conn.recv(1024).decode(FORMAT)
     return list
 
-# def serverLogin(conn):
-#     user = recvList(conn)
-#     cursor.execute("select pass from Account where username = ?", user[0])
-#     password = cursor.fetchone()
-#     msg = "Invalid"
-#     if(password is None):
-#         msg = "Invalid"
-#         print(msg)
-#     else:
-#         userPassword = password[0]
-#         if(userPassword == user[1]):
-#             msg = "login successfully"
-#             print(msg)
-#     conn.sendall(msg.encode(FORMAT))
 
 
 def handleClient(conn, addr):
     msg = None
-    msg2 = None
-    while(msg != "x"):
+    while(True):
         msg = conn.recv(1024).decode(FORMAT)
-        print("client",addr,"talk:",msg)
-        if(msg == LIST):
-            conn.sendall(msg.encode(FORMAT))
-            list = recvList(conn)
-            print("recieved")
-            a = 0
-            for item in list:
-                a+=1
-                if(a == 1):
-                    print("username:", item)
-                if(a == 2):
-                    print("height:", item)
-                if(a == 3):
-                    print("weight:", item)
-
-        # if(msg == LOGIN):
-        #     conn.sendall(msg.encode(FORMAT))
-        #     serverLogin(conn)
-        if(msg == "x"):
-            break
-        # msg2 = input("respond: ")
-        # conn.sendall(msg2.encode(FORMAT))
-    print("client address:",addr,"finished")
-    conn.close()
+        while(msg != INVALID and msg != SUCCESS):
+            username = conn.recv(1024).decode(FORMAT)
+            conn.sendall(username.encode(FORMAT))
+            password = conn.recv(1024).decode(FORMAT)
+            conn.sendall(password.encode(FORMAT))
+            if(msg == LOGIN):
+                for cont in content:
+                    if cont['username'] == username and cont['password'] == password :
+                        msg = SUCCESS
+                        break
+                if(msg != SUCCESS):
+                    msg = INVALID
+            if(msg == SIGNUP):
+                account = {"username": username, "password" : password}
+                content.append(account)
+                with open("accounts.json","w") as f:
+                    json.dump(content,f,indent=2)
+                msg = SUCCESS
+        conn.sendall(msg.encode(FORMAT))
+    # print("client address:",addr,"finished")
+    # conn.close()
 
 
 
