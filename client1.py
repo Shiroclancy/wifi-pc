@@ -33,12 +33,20 @@ class SignUpPage(tk.Frame):
         self.label_notice.pack()
         self.btn_signup.pack()
 class HomePage(tk.Frame):
-    def __init__(self,parent,appController,client):
+    def __init__(self,parent,app):
         tk.Frame.__init__(self,parent)
+        label_login = tk.Label(self,text="You have logging successfully")
         label_title = tk.Label(self, text = 'HOME PAGE')
-        btn_logout = tk.Button(self,text='logout',command=lambda:appController.showPage(StartPage))
+        hotel_info = tk.Button(self,text='Find hotel information')
+        hotel_book = tk.Button(self,text='Book a room in specific hotel')
+        hotel_removebooking = tk.Button(self,text='logout')
+        blank=tk.Label(self,text="")
+        btn_logout = tk.Button(self,text='logout',command=lambda:app.showPage(StartPage))
         label_title.pack()
-        btn_logout.pack()
+        label_login.pack()
+        hotel_info.pack(pady=10)
+        hotel_book.pack(pady=10)
+        btn_logout.pack(pady=10)
 
 class StartPage(tk.Frame):
     def __init__(self,parent,appController,client):
