@@ -11,8 +11,25 @@ FAIL = 'fail'
 SUCCESS = 'Successfull'
 SIGNUP = 'signup'
 INVALID = 'invalid'
+FORMATPASS = 'wrong format pass'
+FORMATUSERNAME = 'wrong format username'
 with open("accounts.json","r") as f:
     content = json.load(f)
+
+def Check_Username(username):
+    Alphabet = "abcdefghijklmnopqrstuvwxyz"
+    Digit = "0123456789"
+    if (len(username) < 5):
+        return False
+    for i in username:
+        if ((i not in Alphabet) and (i not in Digit)):
+            return False
+    return True
+
+def Check_Password(password):
+    if(len(password) < 3):
+        return False
+    return True
 
 def recvList(conn):
     list = []
@@ -27,9 +44,12 @@ def recvList(conn):
 
 def handleClient(conn, addr):
     msg = None
+    msg2 = None
     while(True):
         msg = conn.recv(1024).decode(FORMAT)
-        while(msg != INVALID and msg != SUCCESS):
+        checksignup = False
+        msg2 = None
+        while(msg != INVALID and msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS):
             username = conn.recv(1024).decode(FORMAT)
             conn.sendall(username.encode(FORMAT))
             password = conn.recv(1024).decode(FORMAT)
@@ -41,13 +61,29 @@ def handleClient(conn, addr):
                         break
                 if(msg != SUCCESS):
                     msg = INVALID
+                checksignup = True
             if(msg == SIGNUP):
-                account = {"username": username, "password" : password}
-                content.append(account)
-                with open("accounts.json","w") as f:
-                    json.dump(content,f,indent=2)
-                msg = SUCCESS
+                checkusername = Check_Username(username)
+                checkpass = Check_Password(password)
+                if(checkusername and checkpass):
+                    account = {"username": username, "password" : password}
+                    content.append(account)
+                    with open("accounts.json","w") as f:
+                        json.dump(content,f,indent=2)
+                    msg = SUCCESS
+                    checksignup = True
+                else:
+                    if(checkusername == False):
+                        msg = FORMATUSERNAME
+                    if(checkpass == False):
+                        msg2 = FORMATPASS
+
         conn.sendall(msg.encode(FORMAT))
+        if checksignup == False :
+            conn.recv(1024)
+            conn.sendall(msg2.encode(FORMAT))
+            conn.recv(1024)
+
     # print("client address:",addr,"finished")
     # conn.close()
 
@@ -61,7 +97,7 @@ print("SERVER SIDE")
 print("server: ", HOST, SERVER_PORT)
 print("Waiting for Client")
 nClient = 0
-while (nClient < 3):
+while (nClient < 2):
     nClient += 1   
     try:
         conn, addr = s.accept()

@@ -11,29 +11,37 @@ FAIL = 'fail'
 SUCCESS = 'Successfull'
 SIGNUP = 'signup'
 INVALID = 'invalid'
+FORMATPASS = 'wrong format pass'
+FORMATUSERNAME = 'wrong format username'
 class SignUpPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
         self.label_title = tk.Label(self, text = 'Sign up')
-        self.label_notice = tk.Label(self,text='',bg='bisque')
+        self.label_notice = tk.Label(self,text='')
         self.label_username = tk.Label(self, text = 'username')
         self.entry_username = tk.Entry(self,bg='light yellow',width=30)
+        self.label_noticeUsername = tk.Label(self,text='')
         self.label_password = tk.Label(self, text = 'password')
         self.entry_password = tk.Entry(self,bg='light yellow',width=30)
+        self.label_noticePassword = tk.Label(self,text='')
         self.label_RetypePassword = tk.Label(self, text = 'retype password')
         self.entry_RetypePassword = tk.Entry(self,bg='light yellow',width=30)
         self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.Signup(self,client))
+        self.btn_backlogin = tk.Button(self,text='login ->',command=lambda: appController.showPage(StartPage))
         self.label_title.pack()
         self.label_username.pack()
         self.entry_username.pack()
+        self.label_noticeUsername.pack()
         self.label_password.pack()
         self.entry_password.pack()
+        self.label_noticePassword.pack()
         self.label_RetypePassword.pack()
         self.entry_RetypePassword.pack()
         self.label_notice.pack()
         self.btn_signup.pack()
+        self.btn_backlogin.pack()
 class HomePage(tk.Frame):
-    def __init__(self,parent,app):
+    def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
         label_login = tk.Label(self,text="You have logging successfully")
         label_title = tk.Label(self, text = 'HOME PAGE')
@@ -41,7 +49,7 @@ class HomePage(tk.Frame):
         hotel_book = tk.Button(self,text='Book a room in specific hotel')
         hotel_removebooking = tk.Button(self,text='logout')
         blank=tk.Label(self,text="")
-        btn_logout = tk.Button(self,text='logout',command=lambda:app.showPage(StartPage))
+        btn_logout = tk.Button(self,text='logout',command=lambda:appController.showPage(StartPage))
         label_title.pack()
         label_login.pack()
         hotel_info.pack(pady=10)
@@ -74,7 +82,7 @@ class App(tk.Tk):
     def __init__(self,client):
         tk.Tk.__init__(self)
         self.title("My app")
-        self.geometry("500x200")
+        self.geometry("500x250")
         self.resizable(width=False, height=False)
 
         container = tk.Frame()
@@ -126,7 +134,17 @@ class App(tk.Tk):
             client.recv(1024)
             msg = client.recv(1024).decode(FORMAT)
             if msg == SUCCESS:
-                self.showPage(StartPage)
+                curFrame.label_noticeUsername["text"] = ''
+                curFrame.label_noticePassword["text"] = ''
+                curFrame.label_notice["text"] = 'Sign up successfully !'
+            else:
+                client.sendall(msg.encode(FORMAT))
+                msg2 = client.recv(1024).decode(FORMAT)
+                client.sendall(msg2.encode(FORMAT))
+                if(msg == FORMATUSERNAME):
+                    curFrame.label_noticeUsername["text"] = 'Username must have at least 5 character (a-z)(0-9)'
+                if(msg2 == FORMATPASS):
+                    curFrame.label_noticePassword["text"] = 'Password must have at least 3 character'
     def showPage(self,frameName):
         self.frames[frameName].tkraise()
 
