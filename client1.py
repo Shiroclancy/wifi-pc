@@ -17,6 +17,51 @@ FORMATUSERNAME = 'wrong format username'
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
+        title = tk.Label(self,text=" Book a hotel room")
+        hotelName = tk.Label(self,text="Hotel name/code: ")
+        roomtype = tk.Label(self,text="Room type: ")
+        DateOfEntry = tk.Label(self, text = 'Date of entry: ')
+        DateOfExit = tk.Label(self,text="Date of exit: ")
+        Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
+        Enter= tk.Button(self,text="Enter")
+        Note = tk.Label(self,text="Note: ")
+        name = tk.Entry(self,bg='white',width=30)
+        entry = tk.Entry(self,bg='white',width=30)
+        exit = tk.Entry(self,bg='white',width=30)
+        room = tk.Entry(self,bg='white',width=30)
+        Enote = tk.Entry(self,bg='white',width=30)
+
+        self.grid_rowconfigure(1,minsize=20)
+        self.grid_rowconfigure(13,minsize=50)
+        self.grid_columnconfigure(0,minsize=100)
+        self.grid_columnconfigure(3,minsize=100)
+
+        title.grid(row=0,column=1,columnspan=2)
+
+        hotelName.grid(row=2,column=1,sticky="w")
+        name.grid(row=2,column=2)
+        self.grid_rowconfigure(3,minsize=10)
+
+        roomtype.grid(row=4,column=1,sticky="w")
+        room.grid(row=4,column=2)
+        self.grid_rowconfigure(5,minsize=10)
+
+        DateOfEntry.grid(row=6,column=1,sticky="w")
+        entry.grid(row=6,column=2)
+        self.grid_rowconfigure(7,minsize=10)
+
+        DateOfExit.grid(row=8,column=1,sticky="w")
+        exit.grid(row=8,column=2)
+        self.grid_rowconfigure(9,minsize=10)
+
+        Note.grid(row=10,column=1,sticky="w")
+        Enote.grid(row=10,column=2)
+        self.grid_rowconfigure(11,minsize=20)
+
+        Home.grid(row=12,column=1,sticky="w")
+        Enter.grid(row=12,column=2,sticky="e")
+
+
         #Tên/ mã khách sạn
         #Loại phòng cần đặt
         #Ngày vào ở
@@ -26,17 +71,18 @@ class BookingPage(tk.Frame):
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
-        notice =tk.Frame(borderwidth=1)
         title = tk.Label(self,text="Finding hotel avaiable room")
         hotelName = tk.Label(self,text="Hotel name: ")
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
+        Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
+        Enter= tk.Button(self,text="Enter")
         name = tk.Entry(self,bg='white',width=30)
         entry = tk.Entry(self,bg='white',width=30)
         exit = tk.Entry(self,bg='white',width=30)
 
         self.grid_rowconfigure(1,minsize=50)
-        self.grid_rowconfigure(12,minsize=50)
+        self.grid_rowconfigure(13,minsize=50)
         self.grid_columnconfigure(0,minsize=100)
         self.grid_columnconfigure(3,minsize=100)
 
@@ -51,8 +97,11 @@ class HotelInfoPage(tk.Frame):
 
         DateOfExit.grid(row=10,column=1,sticky="w")
         exit.grid(row=10,column=2,sticky="w")
-       
+        self.grid_rowconfigure(11,minsize=20)
 
+        Home.grid(row=12,column=1,sticky="w")
+        Enter.grid(row=12,column=2,sticky="e")
+       
 class SignUpPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
@@ -87,7 +136,7 @@ class HomePage(tk.Frame):
         label_login = tk.Label(self,text="You have logging successfully")
         label_title = tk.Label(self, text = 'HOME PAGE')
         hotel_info = tk.Button(self,text='Find hotel information',command=lambda:appController.showPage(HotelInfoPage))
-        hotel_book = tk.Button(self,text='Book a room in specific hotel')
+        hotel_book = tk.Button(self,text='Book a room in specific hotel',command=lambda:appController.showPage(BookingPage))
         hotel_removebooking = tk.Button(self,text='logout')
         blank=tk.Label(self,text="")
         btn_logout = tk.Button(self,text='logout',command=lambda:appController.showPage(StartPage))
@@ -117,15 +166,15 @@ class StartPage(tk.Frame):
         label_notice.grid(row=1,column=1,columnspan=2)
 
         label_username.grid(row=4,column=1,sticky="w")
-        entry_username.grid(row=4,column=2,sticky="w")
+        entry_username.grid(row=4,column=2,padx=10)
         self.grid_rowconfigure(5,minsize=20)
         
         label_password.grid(row=6,column=1,sticky="w")
-        entry_password.grid(row=6,column=2,sticky="w")
+        entry_password.grid(row=6,column=2,padx=10)
         self.grid_rowconfigure(7,minsize=30)
+
         btn_login.grid(row=8,column=1,sticky="w")
         btn_signup.grid(row=8,column=2,sticky="e")
-
 
 class App(tk.Tk):
     def __init__(self,client):
@@ -141,11 +190,11 @@ class App(tk.Tk):
         container.grid_columnconfigure(0,weight=1)
 
         self.frames = {}
-        for F in (StartPage,HomePage,SignUpPage,HotelInfoPage):
+        for F in (StartPage,HomePage,SignUpPage,HotelInfoPage,BookingPage):
             frame = F(container,self,client)
             frame.grid(row=0, column=0, sticky="nsew")
             self.frames[F] = frame
-        self.frames[StartPage].tkraise()
+        self.frames[BookingPage].tkraise()
 
     def Login(self,curFrame,client):
         username = curFrame.entry_username.get()
