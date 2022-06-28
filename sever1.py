@@ -1,4 +1,5 @@
 import json
+from pickle import TRUE
 import socket
 import threading
 HOST = "127.0.0.1"
@@ -13,6 +14,7 @@ SIGNUP = 'signup'
 INVALID = 'invalid'
 FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
+DUPLICATEUSER = 'duplicate user name'
 with open("accounts.json","r") as f:
     content = json.load(f)
 
@@ -31,64 +33,89 @@ def Check_Password(password):
         return False
     return True
 
-def recvList(conn):
-    list = []
-    item = conn.recv(1024).decode(FORMAT)
-    while(item != "end"):
-        list.append(item)
-        conn.sendall(item.encode(FORMAT))
-        item = conn.recv(1024).decode(FORMAT)
-    return list
-
-
-
+def handleLogin(msg,username,password):
+    for cont in content:
+        if cont['username'] == username and cont['password'] == password :
+            msg = SUCCESS
+            break
+    if(msg != SUCCESS):
+        msg = INVALID
+    return msg
+def handleSignup(msg,msg2,msg3,username,password,checksignup):
+    checkDuplicate = True
+    for cont in content:
+        if cont['username'] == username :
+            msg3 = DUPLICATEUSER
+            checkDuplicate = False
+            break
+    checkusername = Check_Username(username)
+    checkpass = Check_Password(password)
+    if(checkusername and checkpass and checkDuplicate):
+        account = {"username": username, "password" : password}
+        content.append(account)
+        with open("accounts.json","w") as f:
+            json.dump(content,f,indent=2)
+        msg = SUCCESS
+    else:
+        checksignup = False
+        if(checkusername == False):
+            msg = FORMATUSERNAME
+        if(checkpass == False):
+            msg2 = FORMATPASS
+    return (msg,msg2,msg3,checksignup)
 def handleClient(conn, addr):
     msg = None
     msg2 = None
     while(True):
-        msg = conn.recv(1024).decode(FORMAT)
-        checksignup = False
+        try:
+            msg = conn.recv(1024).decode(FORMAT)
+        except:
+            break
+        checksignup = True
         msg2 = None
-        while(msg != INVALID and msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS):
+        msg3 = None
+        while(msg != INVALID and msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS and msg3 != DUPLICATEUSER):
             username = conn.recv(1024).decode(FORMAT)
             conn.sendall(username.encode(FORMAT))
             password = conn.recv(1024).decode(FORMAT)
             conn.sendall(password.encode(FORMAT))
             if(msg == LOGIN):
-                for cont in content:
-                    if cont['username'] == username and cont['password'] == password :
-                        msg = SUCCESS
-                        break
-                if(msg != SUCCESS):
-                    msg = INVALID
-                checksignup = True
-            if(msg == SIGNUP):
-                checkusername = Check_Username(username)
-                checkpass = Check_Password(password)
-                if(checkusername and checkpass):
-                    account = {"username": username, "password" : password}
-                    content.append(account)
-                    with open("accounts.json","w") as f:
-                        json.dump(content,f,indent=2)
-                    msg = SUCCESS
-                    checksignup = True
-                else:
-                    if(checkusername == False):
-                        msg = FORMATUSERNAME
-                    if(checkpass == False):
-                        msg2 = FORMATPASS
-
+                # for cont in content:
+                #     if cont['username'] == username and cont['password'] == password :
+                #         msg = SUCCESS
+                #         break
+                # if(msg != SUCCESS):
+                #     msg = INVALID
+                # checksignup = True
+                msg = handleLogin(msg,username,password)
+            elif(msg == SIGNUP):
+                # checkusername = Check_Username(username)
+                # checkpass = Check_Password(password)
+                # if(checkusername and checkpass):
+                #     account = {"username": username, "password" : password}
+                #     content.append(account)
+                #     with open("accounts.json","w") as f:
+                #         json.dump(content,f,indent=2)
+                #     msg = SUCCESS
+                # else:
+                #     checksignup = False
+                #     if(checkusername == False):
+                #         msg = FORMATUSERNAME
+                #     if(checkpass == False):
+                #         msg2 = FORMATPASS
+                (msg,msg2,msg3,checksignup) = handleSignup(msg,msg2,msg3,username,password,checksignup)
         conn.sendall(msg.encode(FORMAT))
         if checksignup == False :
             conn.recv(1024)
+            if(msg2 == None):msg2 = 'a'
+            if(msg3 == None):msg3 = 'a'
             conn.sendall(msg2.encode(FORMAT))
             conn.recv(1024)
+            conn.sendall(msg3.encode(FORMAT))
+            conn.recv(1024)
 
-    # print("client address:",addr,"finished")
-    # conn.close()
-
-
-
+    print("client address:",addr,"finished")
+    conn.close()
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 s.bind((HOST,SERVER_PORT))
@@ -97,7 +124,7 @@ print("SERVER SIDE")
 print("server: ", HOST, SERVER_PORT)
 print("Waiting for Client")
 nClient = 0
-while (nClient < 2):
+while (nClient < 4):
     nClient += 1   
     try:
         conn, addr = s.accept()

@@ -13,7 +13,7 @@ SIGNUP = 'signup'
 INVALID = 'invalid'
 FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
-
+DUPLICATEUSER = 'duplicate user name'
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -150,31 +150,31 @@ class StartPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
 
-        label_title = tk.Label(self, text = 'LOGIN')
-        label_notice = tk.Label(self,text='',bg='bisque')
-        label_username = tk.Label(self, text = 'username')
-        entry_username = tk.Entry(self,bg='light yellow',width=30)
-        label_password = tk.Label(self, text = 'password')
-        entry_password = tk.Entry(self,bg='light yellow',width=30)
-        btn_login = tk.Button(self,text='Login',command=lambda: appController.Login(self,client))
-        btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.showPage(SignUpPage))
+        self.label_title = tk.Label(self, text = 'LOGIN')
+        self.label_notice = tk.Label(self,text='',bg='bisque')
+        self.label_username = tk.Label(self, text = 'username')
+        self.entry_username = tk.Entry(self,bg='light yellow',width=30)
+        self.label_password = tk.Label(self, text = 'password')
+        self.entry_password = tk.Entry(self,bg='light yellow',width=30)
+        self.btn_login = tk.Button(self,text='Login',command=lambda: appController.Login(self,client))
+        self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.showPage(SignUpPage))
         
         self.grid_rowconfigure(3,minsize=20)
         self.grid_columnconfigure(0,minsize=125)
 
-        label_title.grid(row=0,column=1,columnspan=2)
-        label_notice.grid(row=1,column=1,columnspan=2)
+        self.label_title.grid(row=0,column=1,columnspan=2)
+        self.label_notice.grid(row=1,column=1,columnspan=2)
 
-        label_username.grid(row=4,column=1,sticky="w")
-        entry_username.grid(row=4,column=2,padx=10)
+        self.label_username.grid(row=4,column=1,sticky="w")
+        self.entry_username.grid(row=4,column=2,padx=10)
         self.grid_rowconfigure(5,minsize=20)
         
-        label_password.grid(row=6,column=1,sticky="w")
-        entry_password.grid(row=6,column=2,padx=10)
+        self.label_password.grid(row=6,column=1,sticky="w")
+        self.entry_password.grid(row=6,column=2,padx=10)
         self.grid_rowconfigure(7,minsize=30)
 
-        btn_login.grid(row=8,column=1,sticky="w")
-        btn_signup.grid(row=8,column=2,sticky="e")
+        self.btn_login.grid(row=8,column=1,sticky="w")
+        self.btn_signup.grid(row=8,column=2,sticky="e")
 
 class App(tk.Tk):
     def __init__(self,client):
@@ -194,7 +194,7 @@ class App(tk.Tk):
             frame = F(container,self,client)
             frame.grid(row=0, column=0, sticky="nsew")
             self.frames[F] = frame
-        self.frames[BookingPage].tkraise()
+        self.frames[StartPage].tkraise()
 
     def Login(self,curFrame,client):
         username = curFrame.entry_username.get()
@@ -236,13 +236,20 @@ class App(tk.Tk):
                 curFrame.label_noticePassword["text"] = ''
                 curFrame.label_notice["text"] = 'Sign up successfully !'
             else:
+                curFrame.label_notice["text"] = ''
                 client.sendall(msg.encode(FORMAT))
                 msg2 = client.recv(1024).decode(FORMAT)
                 client.sendall(msg2.encode(FORMAT))
-                if(msg == FORMATUSERNAME):
-                    curFrame.label_noticeUsername["text"] = 'Username must have at least 5 character (a-z)(0-9)'
-                if(msg2 == FORMATPASS):
-                    curFrame.label_noticePassword["text"] = 'Password must have at least 3 character'
+                msg3 = client.recv(1024).decode(FORMAT)
+                client.sendall(msg3.encode(FORMAT))
+                if(msg3 == DUPLICATEUSER):
+                    curFrame.label_noticeUsername["text"] = 'Already has this username'
+                else:
+                    curFrame.label_noticeUsername["text"] = ''
+                    if(msg == FORMATUSERNAME):
+                        curFrame.label_noticeUsername["text"] = 'Username must have at least 5 character (a-z)(0-9)'
+                    if(msg2 == FORMATPASS):
+                        curFrame.label_noticePassword["text"] = 'Password must have at least 3 character'
     def showPage(self,frameName):
         self.frames[frameName].tkraise()
 
