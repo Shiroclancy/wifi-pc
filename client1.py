@@ -61,13 +61,6 @@ class BookingPage(tk.Frame):
         Home.grid(row=12,column=1,sticky="w")
         Enter.grid(row=12,column=2,sticky="e")
 
-
-        #Tên/ mã khách sạn
-        #Loại phòng cần đặt
-        #Ngày vào ở
-        #Ngày rời đi
-        #Ghi chú
-
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -220,9 +213,11 @@ class App(tk.Tk):
         username = curFrame.entry_username.get()
         password = curFrame.entry_password.get()
         RetypePassword = curFrame.entry_RetypePassword.get()
-        if (RetypePassword != password):
+        if (RetypePassword != password and RetypePassword != ''):
             curFrame.label_notice["text"] = 'Password are not the same'
             return
+        elif(username == '' or password == '' or RetypePassword == ''):
+            curFrame.label_notice["text"] = 'Fill your information in the blank field'
         else:
             msg = SIGNUP
             client.sendall(msg.encode(FORMAT))
