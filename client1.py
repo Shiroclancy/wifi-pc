@@ -13,6 +13,7 @@ SIGNUP = 'signup'
 INVALID = 'invalid'
 FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
+FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
@@ -61,6 +62,13 @@ class BookingPage(tk.Frame):
         Home.grid(row=12,column=1,sticky="w")
         Enter.grid(row=12,column=2,sticky="e")
 
+
+        #Tên/ mã khách sạn
+        #Loại phòng cần đặt
+        #Ngày vào ở
+        #Ngày rời đi
+        #Ghi chú
+
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -108,6 +116,9 @@ class SignUpPage(tk.Frame):
         self.label_noticePassword = tk.Label(self,text='')
         self.label_RetypePassword = tk.Label(self, text = 'retype password')
         self.entry_RetypePassword = tk.Entry(self,bg='light yellow',width=30)
+        self.label_noticeRetypePassword = tk.Label(self,text='')
+        self.label_BankCode = tk.Label(self, text = 'Bank Code')
+        self.entry_BankCode = tk.Entry(self,bg='light yellow',width=30)
         self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.Signup(self,client))
         self.btn_backlogin = tk.Button(self,text='login ->',command=lambda: appController.showPage(StartPage))
         self.label_title.pack()
@@ -119,6 +130,9 @@ class SignUpPage(tk.Frame):
         self.label_noticePassword.pack()
         self.label_RetypePassword.pack()
         self.entry_RetypePassword.pack()
+        self.label_noticeRetypePassword.pack()
+        self.label_BankCode.pack()
+        self.entry_BankCode.pack()
         self.label_notice.pack()
         self.btn_signup.pack()
         self.btn_backlogin.pack()
@@ -173,7 +187,7 @@ class App(tk.Tk):
     def __init__(self,client):
         tk.Tk.__init__(self)
         self.title("My app")
-        self.geometry("500x250")
+        self.geometry("500x300")
         self.resizable(width=False, height=False)
 
         container = tk.Frame()
@@ -212,12 +226,15 @@ class App(tk.Tk):
     def Signup(self,curFrame,client):
         username = curFrame.entry_username.get()
         password = curFrame.entry_password.get()
+        BankCode = curFrame.entry_BankCode.get()
         RetypePassword = curFrame.entry_RetypePassword.get()
         if (RetypePassword != password and RetypePassword != ''):
-            curFrame.label_notice["text"] = 'Password are not the same'
+            curFrame.label_noticeRetypePassword["text"] = 'Wrong password'
             return
-        elif(username == '' or password == '' or RetypePassword == ''):
-            curFrame.label_notice["text"] = 'Fill your information in the blank field'
+        else:
+            curFrame.label_noticeRetypePassword["text"] = ''
+        if(username == '' or password == '' or RetypePassword == '' or BankCode == ''):
+            curFrame.label_notice["text"] = 'Fill your informations in the blank fields'
         else:
             msg = SIGNUP
             client.sendall(msg.encode(FORMAT))
@@ -225,10 +242,13 @@ class App(tk.Tk):
             client.recv(1024)
             client.sendall(password.encode(FORMAT))
             client.recv(1024)
+            client.sendall(BankCode.encode(FORMAT))
+            client.recv(1024)
             msg = client.recv(1024).decode(FORMAT)
             if msg == SUCCESS:
                 curFrame.label_noticeUsername["text"] = ''
                 curFrame.label_noticePassword["text"] = ''
+                curFrame.label_noticeRetypePassword["text"] = ''
                 curFrame.label_notice["text"] = 'Sign up successfully !'
             else:
                 curFrame.label_notice["text"] = ''
@@ -237,6 +257,8 @@ class App(tk.Tk):
                 client.sendall(msg2.encode(FORMAT))
                 msg3 = client.recv(1024).decode(FORMAT)
                 client.sendall(msg3.encode(FORMAT))
+                msg4 = client.recv(1024).decode(FORMAT)
+                client.sendall(msg4.encode(FORMAT))
                 if(msg3 == DUPLICATEUSER):
                     curFrame.label_noticeUsername["text"] = 'Already has this username'
                 else:
@@ -245,6 +267,12 @@ class App(tk.Tk):
                         curFrame.label_noticeUsername["text"] = 'Username must have at least 5 character (a-z)(0-9)'
                     if(msg2 == FORMATPASS):
                         curFrame.label_noticePassword["text"] = 'Password must have at least 3 character'
+                    else:
+                        curFrame.label_noticePassword["text"] = ''
+                    if(msg4 == FORMATBANKCODE):
+                        curFrame.label_notice["text"] = 'Bank code must have 10 digit'
+                    else:
+                        curFrame.label_notice["text"] = ''
     def showPage(self,frameName):
         self.frames[frameName].tkraise()
 

@@ -77,6 +77,7 @@ def handleSignup(msg,msg2,msg3,msg4,username,password,BankCode,checksignup):
 def handleClient(conn, addr):
     msg = None
     msg2 = None
+    msg3 = None
     while(True):
         try:
             msg = conn.recv(1024).decode(FORMAT)
@@ -86,35 +87,19 @@ def handleClient(conn, addr):
         msg2 = None
         msg3 = None
         msg4 = None
-        while(msg != INVALID and msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS and msg3 != DUPLICATEUSER and msg4 != FORMATBANKCODE):
-            username = conn.recv(1024).decode(FORMAT)
-            conn.sendall(username.encode(FORMAT))
-            password = conn.recv(1024).decode(FORMAT)
-            conn.sendall(password.encode(FORMAT))
-            if(msg == LOGIN):
-                # for cont in content:
-                #     if cont['username'] == username and cont['password'] == password :
-                #         msg = SUCCESS
-                #         break
-                # if(msg != SUCCESS):
-                #     msg = INVALID
-                # checksignup = True
+        if(msg == LOGIN):
+            while(msg != INVALID and msg != SUCCESS):
+                username = conn.recv(1024).decode(FORMAT)
+                conn.sendall(username.encode(FORMAT))
+                password = conn.recv(1024).decode(FORMAT)
+                conn.sendall(password.encode(FORMAT))
                 msg = handleLogin(msg,username,password)
-            elif(msg == SIGNUP):
-                # checkusername = Check_Username(username)
-                # checkpass = Check_Password(password)
-                # if(checkusername and checkpass):
-                #     account = {"username": username, "password" : password}
-                #     content.append(account)
-                #     with open("accounts.json","w") as f:
-                #         json.dump(content,f,indent=2)
-                #     msg = SUCCESS
-                # else:
-                #     checksignup = False
-                #     if(checkusername == False):
-                #         msg = FORMATUSERNAME
-                #     if(checkpass == False):
-                #         msg2 = FORMATPASS
+        elif(msg == SIGNUP):
+            while(msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS and msg3 != DUPLICATEUSER and msg4 != FORMATBANKCODE):
+                username = conn.recv(1024).decode(FORMAT)
+                conn.sendall(username.encode(FORMAT))
+                password = conn.recv(1024).decode(FORMAT)
+                conn.sendall(password.encode(FORMAT))
                 BankCode = conn.recv(1024).decode(FORMAT)
                 conn.sendall(BankCode.encode(FORMAT))
                 (msg,msg2,msg3,msg4,checksignup) = handleSignup(msg,msg2,msg3,msg4,username,password,BankCode,checksignup)
