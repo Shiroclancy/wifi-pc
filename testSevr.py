@@ -41,38 +41,50 @@ def Check_Password(password):
         return False
     return True
 
-def handleLogin(msg,username,password):
-    for cont in content:
-        if cont['username'] == username and cont['password'] == password :
-            msg = SUCCESS
-            break
-    if(msg != SUCCESS):
-        msg = INVALID
+def handleLogin(msg):
+    while(msg != INVALID and msg != SUCCESS):
+        username = conn.recv(1024).decode(FORMAT)
+        conn.sendall(username.encode(FORMAT))
+        password = conn.recv(1024).decode(FORMAT)
+        conn.sendall(password.encode(FORMAT))
+        for cont in content:
+            if cont['username'] == username and cont['password'] == password :
+                msg = SUCCESS
+                break
+        if(msg != SUCCESS):
+            msg = INVALID
     return msg
-def handleSignup(msg,msg2,msg3,msg4,username,password,BankCode,checksignup):
-    checkDuplicate = True
-    for cont in content:
-        if cont['username'] == username :
-            msg3 = DUPLICATEUSER
-            checkDuplicate = False
-            break
-    checkBankcode = Check_BankCode(BankCode)
-    checkusername = Check_Username(username)
-    checkpass = Check_Password(password)
-    if(checkusername and checkpass and checkDuplicate and checkBankcode):
-        account = {"username": username, "password" : password,"bankcode": BankCode}
-        content.append(account)
-        with open("accounts.json","w") as f:
-            json.dump(content,f,indent=2)
-        msg = SUCCESS
-    else:
-        checksignup = False
-        if(checkusername == False):
-            msg = FORMATUSERNAME
-        if(checkpass == False):
-            msg2 = FORMATPASS
-        if(checkBankcode == False):
-            msg4 = FORMATBANKCODE
+def handleSignup(msg,msg2,msg3,msg4,checksignup):
+    while(msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS and msg3 != DUPLICATEUSER and msg4 != FORMATBANKCODE):
+        username = conn.recv(1024).decode(FORMAT)
+        conn.sendall(username.encode(FORMAT))
+        password = conn.recv(1024).decode(FORMAT)
+        conn.sendall(password.encode(FORMAT))
+        BankCode = conn.recv(1024).decode(FORMAT)
+        conn.sendall(BankCode.encode(FORMAT))
+        checkDuplicate = True
+        for cont in content:
+            if cont['username'] == username :
+                msg3 = DUPLICATEUSER
+                checkDuplicate = False
+                break
+        checkBankcode = Check_BankCode(BankCode)
+        checkusername = Check_Username(username)
+        checkpass = Check_Password(password)
+        if(checkusername and checkpass and checkDuplicate and checkBankcode):
+            account = {"username": username, "password" : password,"bankcode": BankCode}
+            content.append(account)
+            with open("accounts.json","w") as f:
+                json.dump(content,f,indent=2)
+            msg = SUCCESS
+        else:
+            checksignup = False
+            if(checkusername == False):
+                msg = FORMATUSERNAME
+            if(checkpass == False):
+                msg2 = FORMATPASS
+            if(checkBankcode == False):
+                msg4 = FORMATBANKCODE
     return (msg,msg2,msg3,msg4,checksignup)
 def handleClient(conn, addr):
     msg = None
@@ -88,21 +100,9 @@ def handleClient(conn, addr):
         msg3 = None
         msg4 = None
         if(msg == LOGIN):
-            while(msg != INVALID and msg != SUCCESS):
-                username = conn.recv(1024).decode(FORMAT)
-                conn.sendall(username.encode(FORMAT))
-                password = conn.recv(1024).decode(FORMAT)
-                conn.sendall(password.encode(FORMAT))
-                msg = handleLogin(msg,username,password)
+            msg = handleLogin(msg)
         elif(msg == SIGNUP):
-            while(msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS and msg3 != DUPLICATEUSER and msg4 != FORMATBANKCODE):
-                username = conn.recv(1024).decode(FORMAT)
-                conn.sendall(username.encode(FORMAT))
-                password = conn.recv(1024).decode(FORMAT)
-                conn.sendall(password.encode(FORMAT))
-                BankCode = conn.recv(1024).decode(FORMAT)
-                conn.sendall(BankCode.encode(FORMAT))
-                (msg,msg2,msg3,msg4,checksignup) = handleSignup(msg,msg2,msg3,msg4,username,password,BankCode,checksignup)
+            (msg,msg2,msg3,msg4,checksignup) = handleSignup(msg,msg2,msg3,msg4,checksignup)
         conn.sendall(msg.encode(FORMAT))
         if checksignup == False :
             conn.recv(1024)

@@ -243,51 +243,59 @@ class App(tk.Tk):
         password = curFrame.entry_password.get()
         BankCode = curFrame.entry_BankCode.get()
         RetypePassword = curFrame.entry_RetypePassword.get()
-        if (RetypePassword != password and RetypePassword != ''):
+        if(username == '' or password == '' or RetypePassword == '' or BankCode == ''):
+            curFrame.label_noticeUsername["text"] = ''
+            curFrame.label_noticePassword["text"] = ''
+            curFrame.label_noticeRetypePassword["text"] = ''
+            curFrame.label_notice["text"] = 'Fill your information \n in the blank fields'
+            return
+        else:
+            curFrame.label_notice["text"] = ''
+        if (RetypePassword != password):
+            curFrame.label_noticeUsername["text"] = ''
+            curFrame.label_noticePassword["text"] = ''
+            curFrame.label_noticeRetypePassword["text"] = ''
             curFrame.label_noticeRetypePassword["text"] = 'Wrong password'
             return
         else:
             curFrame.label_noticeRetypePassword["text"] = ''
-        if(username == '' or password == '' or RetypePassword == '' or BankCode == ''):
-            curFrame.label_notice["text"] = 'Fill your informations \n in the blank fields'
+        msg = SIGNUP
+        client.sendall(msg.encode(FORMAT))
+        client.sendall(username.encode(FORMAT))
+        client.recv(1024)
+        client.sendall(password.encode(FORMAT))
+        client.recv(1024)
+        client.sendall(BankCode.encode(FORMAT))
+        client.recv(1024)
+        msg = client.recv(1024).decode(FORMAT)
+        if msg == SUCCESS:
+            curFrame.label_noticeUsername["text"] = ''
+            curFrame.label_noticePassword["text"] = ''
+            curFrame.label_noticeRetypePassword["text"] = ''
+            curFrame.label_notice["text"] = 'Sign up \n successfully !'
         else:
-            msg = SIGNUP
+            curFrame.label_notice["text"] = ''
             client.sendall(msg.encode(FORMAT))
-            client.sendall(username.encode(FORMAT))
-            client.recv(1024)
-            client.sendall(password.encode(FORMAT))
-            client.recv(1024)
-            client.sendall(BankCode.encode(FORMAT))
-            client.recv(1024)
-            msg = client.recv(1024).decode(FORMAT)
-            if msg == SUCCESS:
-                curFrame.label_noticeUsername["text"] = ''
-                curFrame.label_noticePassword["text"] = ''
-                curFrame.label_noticeRetypePassword["text"] = ''
-                curFrame.label_notice["text"] = 'Sign up \n successfully !'
+            msg2 = client.recv(1024).decode(FORMAT)
+            client.sendall(msg2.encode(FORMAT))
+            msg3 = client.recv(1024).decode(FORMAT)
+            client.sendall(msg3.encode(FORMAT))
+            msg4 = client.recv(1024).decode(FORMAT)
+            client.sendall(msg4.encode(FORMAT))
+            if(msg3 == DUPLICATEUSER):
+                curFrame.label_noticeUsername["text"] = 'Already has this username'
             else:
-                curFrame.label_notice["text"] = ''
-                client.sendall(msg.encode(FORMAT))
-                msg2 = client.recv(1024).decode(FORMAT)
-                client.sendall(msg2.encode(FORMAT))
-                msg3 = client.recv(1024).decode(FORMAT)
-                client.sendall(msg3.encode(FORMAT))
-                msg4 = client.recv(1024).decode(FORMAT)
-                client.sendall(msg4.encode(FORMAT))
-                if(msg3 == DUPLICATEUSER):
-                    curFrame.label_noticeUsername["text"] = 'Already has this username'
+                curFrame.label_noticeUsername["text"] = ''
+                if(msg == FORMATUSERNAME):
+                    curFrame.label_noticeUsername["text"] = 'Username must have at least \n 5 character (a-z)(0-9)'
+                if(msg2 == FORMATPASS):
+                    curFrame.label_noticePassword["text"] = 'Password must have at least \n 3 character'
                 else:
-                    curFrame.label_noticeUsername["text"] = ''
-                    if(msg == FORMATUSERNAME):
-                        curFrame.label_noticeUsername["text"] = 'Username must have at least \n 5 character (a-z)(0-9)'
-                    if(msg2 == FORMATPASS):
-                        curFrame.label_noticePassword["text"] = 'Password must have at least \n 3 character'
-                    else:
-                        curFrame.label_noticePassword["text"] = ''
-                    if(msg4 == FORMATBANKCODE):
-                        curFrame.label_notice["text"] = 'Bank code \n must have 10 digit'
-                    else:
-                        curFrame.label_notice["text"] = ''
+                    curFrame.label_noticePassword["text"] = ''
+                if(msg4 == FORMATBANKCODE):
+                    curFrame.label_notice["text"] = 'Bank code \n must have 10 digit'
+                else:
+                    curFrame.label_notice["text"] = ''
     def showPage(self,frameName):
         self.frames[frameName].tkraise()
 
