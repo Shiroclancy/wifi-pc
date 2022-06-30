@@ -15,6 +15,7 @@ FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
 FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
+
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -122,35 +123,30 @@ class SignUpPage(tk.Frame):
         self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.Signup(self,client))
         self.btn_backlogin = tk.Button(self,text='login ->',command=lambda: appController.showPage(StartPage))
 
-        self.grid_rowconfigure(3,minsize=20)
+        self.grid_rowconfigure(1,minsize=20)
         self.grid_columnconfigure(0,minsize=50)
 
-        self.label_title.grid(row=0,column=1,columnspan=2)
-        self.label_notice.grid(row=1,column=1,sticky='w')
-        self.label_noticeUsername.grid(row=2,column=1,sticky='w')
-        self.label_noticePassword.grid(row=1,column=2,sticky='e')
-        self.label_noticeRetypePassword.grid(row=2,column=2,sticky='e')
-
-        self.label_username.grid(row=4,column=1,sticky="w")
-        self.entry_username.grid(row=4,column=2,padx=10)
-        self.grid_rowconfigure(5,minsize=20)
+        self.label_title.grid(row=0,column=1,columnspan=2)       
+        
+        self.label_username.grid(row=3,column=1,sticky="w")
+        self.entry_username.grid(row=3,column=2,padx=10)
+        self.label_noticeUsername.grid(row=4,column=1,columnspan=2)
         
         self.label_password.grid(row=6,column=1,sticky="w")
         self.entry_password.grid(row=6,column=2,padx=10)
-        self.grid_rowconfigure(7,minsize=20)
+        self.label_noticePassword.grid(row=7,column=1,columnspan=2)
 
-        self.label_RetypePassword.grid(row=8,column=1,sticky="w")
-        self.entry_RetypePassword.grid(row=8,column=2,padx=10)
-        self.grid_rowconfigure(9,minsize=20)
+        self.label_RetypePassword.grid(row=9,column=1,sticky="w")
+        self.entry_RetypePassword.grid(row=9,column=2,padx=10)
+        self.label_noticeRetypePassword.grid(row=10,column=1,columnspan=2)
 
-        self.label_BankCode.grid(row=10,column=1,sticky="w")
-        self.entry_BankCode.grid(row=10,column=2,padx=10)
-        self.grid_rowconfigure(11,minsize=30)
+        self.label_BankCode.grid(row=12,column=1,sticky="w")
+        self.entry_BankCode.grid(row=12,column=2,padx=10)
+        self.label_notice.grid(row=13,column=1,columnspan=2)
+        self.grid_rowconfigure(14,minsize=10)
 
-        self.btn_backlogin.grid(row=12,column=1,sticky="w")
-        self.btn_signup.grid(row=12,column=2,sticky="e")
-
-        
+        self.btn_backlogin.grid(row=15,column=1,sticky="w")
+        self.btn_signup.grid(row=15,column=2,sticky="e")
 
 class HomePage(tk.Frame):
     def __init__(self,parent,appController,client):
@@ -247,7 +243,7 @@ class App(tk.Tk):
             curFrame.label_noticeUsername["text"] = ''
             curFrame.label_noticePassword["text"] = ''
             curFrame.label_noticeRetypePassword["text"] = ''
-            curFrame.label_notice["text"] = 'Fill your information \n in the blank fields'
+            curFrame.label_notice["text"] = 'Fill your information in the blank fields'
             return
         else:
             curFrame.label_notice["text"] = ''
@@ -272,7 +268,7 @@ class App(tk.Tk):
             curFrame.label_noticeUsername["text"] = ''
             curFrame.label_noticePassword["text"] = ''
             curFrame.label_noticeRetypePassword["text"] = ''
-            curFrame.label_notice["text"] = 'Sign up \n successfully !'
+            curFrame.label_notice["text"] = 'Sign up successfully !'
         else:
             curFrame.label_notice["text"] = ''
             client.sendall(msg.encode(FORMAT))
@@ -287,13 +283,13 @@ class App(tk.Tk):
             else:
                 curFrame.label_noticeUsername["text"] = ''
                 if(msg == FORMATUSERNAME):
-                    curFrame.label_noticeUsername["text"] = 'Username must have at least \n 5 character (a-z)(0-9)'
+                    curFrame.label_noticeUsername["text"] = 'Username must have at least 5 character (a-z)(0-9)'
                 if(msg2 == FORMATPASS):
-                    curFrame.label_noticePassword["text"] = 'Password must have at least \n 3 character'
+                    curFrame.label_noticePassword["text"] = 'Password must have at least 3 character'
                 else:
                     curFrame.label_noticePassword["text"] = ''
                 if(msg4 == FORMATBANKCODE):
-                    curFrame.label_notice["text"] = 'Bank code \n must have 10 digit'
+                    curFrame.label_notice["text"] = 'Bank code must have 10 digit'
                 else:
                     curFrame.label_notice["text"] = ''
     def showPage(self,frameName):
