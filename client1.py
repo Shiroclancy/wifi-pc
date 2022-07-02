@@ -115,7 +115,7 @@ class SignUpPage(tk.Frame):
         self.label_password = tk.Label(self, text = 'password')
         self.entry_password = tk.Entry(self,bg='light yellow',width=30)
         self.label_noticePassword = tk.Label(self,text='')
-        self.label_RetypePassword = tk.Label(self, text = 'Retype password')
+        self.label_RetypePassword = tk.Label(self, text = 'confirm password')
         self.entry_RetypePassword = tk.Entry(self,bg='light yellow',width=30)
         self.label_noticeRetypePassword = tk.Label(self,text='')
         self.label_BankCode = tk.Label(self, text = 'Bank Code')
