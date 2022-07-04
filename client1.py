@@ -1,5 +1,6 @@
 import tkinter as tk
 import socket
+from tkinter.constants import END, SINGLE
 
 HOST = "127.0.0.1"
 SERVER_PORT = 63000
@@ -33,10 +34,10 @@ class BookingPage(tk.Frame):
         room = tk.Entry(self,bg='white',width=30)
         Enote = tk.Entry(self,bg='white',width=30)
 
-        self.grid_rowconfigure(1,minsize=20)
-        self.grid_rowconfigure(13,minsize=50)
-        self.grid_columnconfigure(0,minsize=100)
-        self.grid_columnconfigure(3,minsize=100)
+        self.grid_rowconfigure(1,weight =1)
+        self.grid_rowconfigure(13,weight =1)
+        self.grid_columnconfigure(0,weight =1)
+        self.grid_columnconfigure(3,weight =1)
 
         title.grid(row=0,column=1,columnspan=2)
 
@@ -63,68 +64,92 @@ class BookingPage(tk.Frame):
         Home.grid(row=12,column=1,sticky="w")
         Enter.grid(row=12,column=2,sticky="e")
 
-
-        #Tên/ mã khách sạn
-        #Loại phòng cần đặt
-        #Ngày vào ở
-        #Ngày rời đi
-        #Ghi chú
-
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text="Finding hotel avaiable room")
-        hotelName = tk.Label(self,text="Hotel name: ")
+        hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15)
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
+        scrollbar = tk.Scrollbar(hotellist,)
+        slash = tk.Label(self,text="/")
+        slash1 = tk.Label(self,text="/")
+        slash2 = tk.Label(self,text="/")
+        slash3 = tk.Label(self,text="/")
+
+        dayentry = tk.Entry(self,bg = 'white',width=2)
+        monthentry = tk.Entry(self,bg = 'white',width=2)
+        yearentry = tk.Entry(self,bg = 'white',width=4)
+
+        dayexit = tk.Entry(self,bg = 'white',width=2)
+        monthexit = tk.Entry(self,bg = 'white',width=2)
+        yearexit = tk.Entry(self,bg = 'white',width=4)
+
+        
+
+
+        # input hotel name into the UI
+        for i in range(20):
+            hotellist.insert(END, "hotel " + str(i))
+
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
         Enter= tk.Button(self,text="Enter")
-        name = tk.Entry(self,bg='white',width=30)
-        entry = tk.Entry(self,bg='white',width=30)
-        exit = tk.Entry(self,bg='white',width=30)
+        
+        title.grid(row=0,column=0,columnspan=10,sticky="we")
+        self.grid_rowconfigure(1,minsize=10)
+        self.grid_columnconfigure(0,minsize=10)
+              
+        hotellist.grid(row=2,column=1,rowspan = 5)
+        scrollbar.grid(row=2,column=1,rowspan = 5,sticky='ens')
+        self.grid_columnconfigure(2, weight = 1)
+        self.grid_rowconfigure(2, weight = 1)
+        DateOfEntry.grid(row=3,column=3)
+        DateOfExit.grid(row=4,column=3)
 
-        self.grid_rowconfigure(1,minsize=50)
-        self.grid_rowconfigure(13,minsize=50)
-        self.grid_columnconfigure(0,minsize=100)
-        self.grid_columnconfigure(3,minsize=100)
+        dayentry.grid(row=3,column=4)
+        dayexit.grid(row=4,column=4)
+        slash.grid(row=3,column=5)
+        slash1.grid(row=4,column=5)
+                
+        monthentry.grid(row=3,column=6)
+        monthexit.grid(row=4,column=6)
+        slash2.grid(row=3 ,column=7)
+        slash3.grid(row=4,column=7)
 
-        title.grid(row=0,column=1,columnspan=2)
-        hotelName.grid(row=2,column=1,sticky="w")
-        name.grid(row=2,column=2,sticky="w")
-        self.grid_rowconfigure(3,minsize=10)
+        yearentry.grid(row=3,column=8)
+        yearexit.grid(row=4,column=8)
 
-        DateOfEntry.grid(row=6,column=1,sticky="w")
-        entry.grid(row=6,column=2,sticky="w")
-        self.grid_rowconfigure(7,minsize=10)
+        self.grid_columnconfigure(9, weight = 1)
+        self.grid_rowconfigure(6, weight = 1)
+        
 
-        DateOfExit.grid(row=10,column=1,sticky="w")
-        exit.grid(row=10,column=2,sticky="w")
-        self.grid_rowconfigure(11,minsize=20)
-
-        Home.grid(row=12,column=1,sticky="w")
-        Enter.grid(row=12,column=2,sticky="e")
+        Home.grid(row=6,column=3)
+        Enter.grid(row=6,column=8)
+        self.grid_rowconfigure(7, weight = 1)
        
 class SignUpPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
         self.label_title = tk.Label(self, text = 'Sign up')
         self.label_notice = tk.Label(self,text='')
-        self.label_username = tk.Label(self, text = 'username')
+        self.label_username = tk.Label(self, text = 'Username: ')
         self.entry_username = tk.Entry(self,bg='light yellow',width=30)
         self.label_noticeUsername = tk.Label(self,text='')
-        self.label_password = tk.Label(self, text = 'password')
+        self.label_password = tk.Label(self, text = 'Password: ')
         self.entry_password = tk.Entry(self,bg='light yellow',width=30)
         self.label_noticePassword = tk.Label(self,text='')
-        self.label_RetypePassword = tk.Label(self, text = 'Retype password')
+        self.label_RetypePassword = tk.Label(self, text = 'Confirm password: ')
         self.entry_RetypePassword = tk.Entry(self,bg='light yellow',width=30)
         self.label_noticeRetypePassword = tk.Label(self,text='')
-        self.label_BankCode = tk.Label(self, text = 'Bank Code')
+        self.label_BankCode = tk.Label(self, text = 'Bank Code: ')
         self.entry_BankCode = tk.Entry(self,bg='light yellow',width=30)
         self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.Signup(self,client))
-        self.btn_backlogin = tk.Button(self,text='login ->',command=lambda: appController.showPage(StartPage))
+        self.btn_backlogin = tk.Button(self,text='Back to/nlogin',command=lambda: appController.showPage(StartPage))
 
-        self.grid_rowconfigure(1,minsize=20)
-        self.grid_columnconfigure(0,minsize=50)
+        self.grid_rowconfigure(1,weight =1)
+        self.grid_rowconfigure(16,weight =1)
+        self.grid_columnconfigure(0,weight =1)
+        self.grid_columnconfigure(3,weight =1)
 
         self.label_title.grid(row=0,column=1,columnspan=2)       
         
@@ -173,26 +198,28 @@ class StartPage(tk.Frame):
         self.label_username = tk.Label(self, text = 'username')
         self.entry_username = tk.Entry(self,bg='light yellow',width=30)
         self.label_password = tk.Label(self, text = 'password')
-        self.entry_password = tk.Entry(self,bg='light yellow',width=30)
+        self.entry_password = tk.Entry(self,bg='light yellow',width=30,show="*")
         self.btn_login = tk.Button(self,text='Login',command=lambda: appController.Login(self,client))
         self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.showPage(SignUpPage))
         
-        self.grid_rowconfigure(3,minsize=20)
-        self.grid_columnconfigure(0,minsize=125)
+        self.grid_rowconfigure(3,weight =1)
+        self.grid_rowconfigure(9,weight =1)
+        self.grid_columnconfigure(0,weight =1)
+        self.grid_columnconfigure(3,weight =1)
 
         self.label_title.grid(row=0,column=1,columnspan=2)
         self.label_notice.grid(row=1,column=1,columnspan=2)
 
-        self.label_username.grid(row=4,column=1,sticky="w")
+        self.label_username.grid(row=4,column=1)
         self.entry_username.grid(row=4,column=2,padx=10)
         self.grid_rowconfigure(5,minsize=20)
         
-        self.label_password.grid(row=6,column=1,sticky="w")
+        self.label_password.grid(row=6,column=1)
         self.entry_password.grid(row=6,column=2,padx=10)
         self.grid_rowconfigure(7,minsize=30)
 
-        self.btn_login.grid(row=8,column=1,sticky="w")
-        self.btn_signup.grid(row=8,column=2,sticky="e")
+        self.btn_signup.grid(row=8,column=1,sticky='w')
+        self.btn_login.grid(row=8,column=2,sticky='e')
 
 class App(tk.Tk):
     def __init__(self,client):
@@ -212,7 +239,7 @@ class App(tk.Tk):
             frame = F(container,self,client)
             frame.grid(row=0, column=0, sticky="nsew")
             self.frames[F] = frame
-        self.frames[StartPage].tkraise()
+        self.frames[HotelInfoPage].tkraise()
 
     def Login(self,curFrame,client):
         username = curFrame.entry_username.get()
