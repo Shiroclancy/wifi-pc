@@ -26,6 +26,11 @@ def recvListt(client):
         client.sendall(item.encode(FORMAT))
         item = client.recv(1024).decode(FORMAT)
     return list
+
+def inputhotel(hotellist):
+    for i in listt:
+        hotellist.insert(END, "hotel " + i)
+
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -72,16 +77,15 @@ class BookingPage(tk.Frame):
 
         Home.grid(row=12,column=1,sticky="w")
         Enter.grid(row=12,column=2,sticky="e")
-
     
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text="Finding hotel avaiable room")
-        hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15)
+        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15)
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
-        scrollbar = tk.Scrollbar(hotellist,)
+        scrollbar = tk.Scrollbar(app.hotellist,)
         slash = tk.Label(self,text="/")
         slash1 = tk.Label(self,text="/")
         slash2 = tk.Label(self,text="/")
@@ -95,17 +99,16 @@ class HotelInfoPage(tk.Frame):
         monthexit = tk.Entry(self,bg = 'white',width=2)
         yearexit = tk.Entry(self,bg = 'white',width=4)
         # listt = recvListt(client)
-        for i in listt:
-            hotellist.insert(END, "hotel " + i)
+        
 
-        Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
+        Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),app.hotellist.delete(0,END)))
         Enter= tk.Button(self,text="Enter")
         
         title.grid(row=0,column=0,columnspan=10,sticky="we")
         self.grid_rowconfigure(1,minsize=10)
         self.grid_columnconfigure(0,minsize=10)
               
-        hotellist.grid(row=2,column=1,rowspan = 5)
+        app.hotellist.grid(row=2,column=1,rowspan = 5)
         # scrollbar.grid(row=2,column=1,rowspan = 5,sticky='ens')
         self.grid_columnconfigure(2, weight = 1)
         self.grid_rowconfigure(2, weight = 1)
@@ -184,7 +187,7 @@ class HomePage(tk.Frame):
         tk.Frame.__init__(self,parent)
         label_login = tk.Label(self,text="You have logging successfully")
         label_title = tk.Label(self, text = 'HOME PAGE')
-        hotel_info = tk.Button(self,text='Find hotel information',command=lambda:appController.showPage(HotelInfoPage))
+        hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), inputhotel(appController.hotellist)))
         hotel_book = tk.Button(self,text='Book a room in specific hotel',command=lambda:appController.showPage(BookingPage))
         hotel_removebooking = tk.Button(self,text='logout')
         blank=tk.Label(self,text="")
@@ -226,6 +229,7 @@ class StartPage(tk.Frame):
 
         self.btn_signup.grid(row=8,column=1,sticky='w')
         self.btn_login.grid(row=8,column=2,sticky='e')
+
 class App(tk.Tk):
     def __init__(self,client):
         tk.Tk.__init__(self)
