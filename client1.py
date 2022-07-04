@@ -1,5 +1,6 @@
 import tkinter as tk
 import socket
+import json
 from tkinter.constants import END, SINGLE
 
 HOST = "127.0.0.1"
@@ -16,7 +17,15 @@ FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
 FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
-
+listt = []
+def recvListt(client):
+    list = []
+    item = client.recv(1024).decode(FORMAT)
+    while(item != "end"):
+        list.append(item)
+        client.sendall(item.encode(FORMAT))
+        item = client.recv(1024).decode(FORMAT)
+    return list
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -64,6 +73,7 @@ class BookingPage(tk.Frame):
         Home.grid(row=12,column=1,sticky="w")
         Enter.grid(row=12,column=2,sticky="e")
 
+    
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -84,13 +94,9 @@ class HotelInfoPage(tk.Frame):
         dayexit = tk.Entry(self,bg = 'white',width=2)
         monthexit = tk.Entry(self,bg = 'white',width=2)
         yearexit = tk.Entry(self,bg = 'white',width=4)
-
-        
-
-
-        # input hotel name into the UI
-        for i in range(20):
-            hotellist.insert(END, "hotel " + str(i))
+        # listt = recvListt(client)
+        for i in listt:
+            hotellist.insert(END, "hotel " + i)
 
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
         Enter= tk.Button(self,text="Enter")
@@ -100,7 +106,7 @@ class HotelInfoPage(tk.Frame):
         self.grid_columnconfigure(0,minsize=10)
               
         hotellist.grid(row=2,column=1,rowspan = 5)
-        scrollbar.grid(row=2,column=1,rowspan = 5,sticky='ens')
+        # scrollbar.grid(row=2,column=1,rowspan = 5,sticky='ens')
         self.grid_columnconfigure(2, weight = 1)
         self.grid_rowconfigure(2, weight = 1)
         DateOfEntry.grid(row=3,column=3)
@@ -220,7 +226,6 @@ class StartPage(tk.Frame):
 
         self.btn_signup.grid(row=8,column=1,sticky='w')
         self.btn_login.grid(row=8,column=2,sticky='e')
-
 class App(tk.Tk):
     def __init__(self,client):
         tk.Tk.__init__(self)
@@ -239,8 +244,7 @@ class App(tk.Tk):
             frame = F(container,self,client)
             frame.grid(row=0, column=0, sticky="nsew")
             self.frames[F] = frame
-        self.frames[HotelInfoPage].tkraise()
-
+        self.frames[StartPage].tkraise()
     def Login(self,curFrame,client):
         username = curFrame.entry_username.get()
         password = curFrame.entry_password.get()
@@ -258,6 +262,8 @@ class App(tk.Tk):
             client.recv(1024)
             msg = client.recv(1024).decode(FORMAT)
             if msg == SUCCESS:
+                global listt
+                listt = recvListt(client)
                 self.showPage(HomePage)
             else:
                 curFrame.label_notice["text"] = INVALID
@@ -321,13 +327,14 @@ class App(tk.Tk):
                     curFrame.label_notice["text"] = ''
     def showPage(self,frameName):
         self.frames[frameName].tkraise()
-
-
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("CLIENT SIDE")
 try:
     client.connect((HOST, SERVER_PORT))
+    # listt = recvListt(client)
 except:
     print("error")
 app = App(client)
 app.mainloop()
+
+

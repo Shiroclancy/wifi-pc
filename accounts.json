@@ -1,27 +1,38 @@
 [
   {
-    "username": "tuan",
+    "username": "tuando",
     "password": "123",
-    "bankcode": "1234567891"
+    "bankcode": "1234567891",
+    "Booked room": []
   },
   {
-    "username": "tuan",
-    "password": "12",
-    "bankcode": "1234567892"
-  },
-  {
-    "username": "tu567",
+    "username": "tungthanh",
     "password": "123",
-    "bankcode": "1234567894"
+    "bankcode": "1234567892",
+    "Booked room": []
   },
   {
-    "username": "tuan789",
-    "password": "1234",
-    "bankcode": "1234567891"
+    "username": "hoahong",
+    "password": "123",
+    "bankcode": "1234567893",
+    "Booked room": []
   },
   {
-    "username": "tuan666",
-    "password": "1234567",
-    "bankcode": "1234567891"
+    "username": "thanhoa",
+    "password": "123",
+    "bankcode": "1234567894",
+    "Booked room": []
+  },
+  {
+    "username": "hoahongnguochuong",
+    "password": "123",
+    "bankcode": "1234567895",
+    "Booked room": []
+  },
+  {
+    "username": "jaytran",
+    "password": "123",
+    "bankcode": "1233445561",
+    "Booked room": []
   }
 ]
