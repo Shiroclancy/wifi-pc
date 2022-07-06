@@ -32,12 +32,18 @@ def inputhotel(hotellist):
     for i in listtHotel:
         hotellist.insert(END, "hotel " + i)
 
+class BookRoom(tk.Frame):
+    def __init__(self,parent,app,client):
+        tk.Frame.__init__(self,parent)
+        title = tk.Label(self,text=" Book a hotel room")
+        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15,width =30)
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text=" Book a hotel room")
         hotelName = tk.Label(self,text="Hotel name/code: ")
         roomtype = tk.Label(self,text="Room type: ")
+        bedtype = tk.Label(self,text="Bed type: ")
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
@@ -47,10 +53,11 @@ class BookingPage(tk.Frame):
         entry = tk.Entry(self,bg='white',width=30)
         exit = tk.Entry(self,bg='white',width=30)
         room = tk.Entry(self,bg='white',width=30)
+        bed = tk.Entry(self,bg='white',width=30)
         Enote = tk.Entry(self,bg='white',width=30)
 
         self.grid_rowconfigure(1,weight =1)
-        self.grid_rowconfigure(13,weight =1)
+        self.grid_rowconfigure(15,weight =1)
         self.grid_columnconfigure(0,weight =1)
         self.grid_columnconfigure(3,weight =1)
 
@@ -64,29 +71,33 @@ class BookingPage(tk.Frame):
         room.grid(row=4,column=2)
         self.grid_rowconfigure(5,minsize=10)
 
-        DateOfEntry.grid(row=6,column=1,sticky="w")
-        entry.grid(row=6,column=2)
+        bedtype.grid(row=6,column=1,sticky="w")
+        bed.grid(row=6,column=2)
         self.grid_rowconfigure(7,minsize=10)
 
-        DateOfExit.grid(row=8,column=1,sticky="w")
-        exit.grid(row=8,column=2)
+        DateOfEntry.grid(row=8,column=1,sticky="w")
+        entry.grid(row=8,column=2)
         self.grid_rowconfigure(9,minsize=10)
 
-        Note.grid(row=10,column=1,sticky="w")
-        Enote.grid(row=10,column=2)
-        self.grid_rowconfigure(11,minsize=20)
+        DateOfExit.grid(row=10,column=1,sticky="w")
+        exit.grid(row=10,column=2)
+        self.grid_rowconfigure(11,minsize=10)
 
-        Home.grid(row=12,column=1,sticky="w")
-        Enter.grid(row=12,column=2,sticky="e")
+        Note.grid(row=12,column=1,sticky="w")
+        Enote.grid(row=12,column=2)
+        self.grid_rowconfigure(13,minsize=20)
+
+        Home.grid(row=14,column=1,sticky="w")
+        Enter.grid(row=14,column=2,sticky="e")
     
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text="Finding hotel avaiable room")
-        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15)
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
-        scrollbar = tk.Scrollbar(app.hotellist,)
+        scrollbar = tk.Scrollbar(self,bg='white')
+        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15,width =30,yscrollcommand = scrollbar.set)
         slash = tk.Label(self,text="/")
         slash1 = tk.Label(self,text="/")
         slash2 = tk.Label(self,text="/")
@@ -110,31 +121,31 @@ class HotelInfoPage(tk.Frame):
         self.grid_columnconfigure(0,minsize=10)
               
         app.hotellist.grid(row=2,column=1,rowspan = 5)
-        # scrollbar.grid(row=2,column=1,rowspan = 5,sticky='ens')
-        self.grid_columnconfigure(2, weight = 1)
+        scrollbar.grid(row=2,column=2,rowspan = 5,ipady=95)
+        self.grid_columnconfigure(3, weight = 1)
         self.grid_rowconfigure(2, weight = 1)
-        DateOfEntry.grid(row=3,column=3)
-        DateOfExit.grid(row=4,column=3)
+        DateOfEntry.grid(row=3,column=4)
+        DateOfExit.grid(row=4,column=4)
 
-        dayentry.grid(row=3,column=4)
-        dayexit.grid(row=4,column=4)
-        slash.grid(row=3,column=5)
-        slash1.grid(row=4,column=5)
+        dayentry.grid(row=3,column=5)
+        dayexit.grid(row=4,column=5)
+        slash.grid(row=3,column=6)
+        slash1.grid(row=4,column=6)
                 
-        monthentry.grid(row=3,column=6)
-        monthexit.grid(row=4,column=6)
-        slash2.grid(row=3 ,column=7)
-        slash3.grid(row=4,column=7)
+        monthentry.grid(row=3,column=7)
+        monthexit.grid(row=4,column=7)
+        slash2.grid(row=3 ,column=8)
+        slash3.grid(row=4,column=8)
 
-        yearentry.grid(row=3,column=8)
-        yearexit.grid(row=4,column=8)
+        yearentry.grid(row=3,column=9)
+        yearexit.grid(row=4,column=9)
 
-        self.grid_columnconfigure(9, weight = 1)
+        self.grid_columnconfigure(10, weight = 1)
         self.grid_rowconfigure(6, weight = 1)
         
 
-        Home.grid(row=6,column=3)
-        Enter.grid(row=6,column=8)
+        Home.grid(row=6,column=4)
+        Enter.grid(row=6,column=9)
         self.grid_rowconfigure(7, weight = 1)
        
 class SignUpPage(tk.Frame):
@@ -186,6 +197,7 @@ class SignUpPage(tk.Frame):
 class HomePage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
+        appController.geometry("800x500")
         label_login = tk.Label(self,text="You have logging successfully")
         label_title = tk.Label(self, text = 'HOME PAGE')
         hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), inputhotel(appController.hotellist)))
