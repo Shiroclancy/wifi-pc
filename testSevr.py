@@ -15,6 +15,42 @@ FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
 FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
+monthDays= [ 31, 28, 31, 30, 31, 30,31, 31, 30, 31, 30, 31 ]
+def countLeapYears(list):
+   years = list[0]
+   if (list[1] <= 2):
+      years-=1
+   return years/4 - years/100 +  years/400
+def getDifference(list1, list2):
+   n1 = list1[0] * 365 + list1[2]
+   i = 0
+   while i< list1[1]-1:
+      n1 += monthDays[i]
+      i+=1
+
+   n1 += countLeapYears(list1)
+   n2 = list2[0] * 365 + list2[2]
+   j  = 0 
+   while j< list2[1]-1:
+      n2 += monthDays[i]
+      j+=1
+   n2 += countLeapYears(list2)
+   return (n2 - n1+1)
+def checkBookedDay(DateEntry1, DateLeaving1, DateEntry2, DateLeaving2):
+    if(getDifference(DateEntry2,DateEntry1) >= 0 and getDifference(DateLeaving2,DateEntry1) < 0):
+        return False
+    if(getDifference(DateEntry2,DateLeaving1) > 0 and getDifference(DateLeaving2,DateLeaving1) <= 0):
+        return False
+    if(getDifference(DateEntry2,DateEntry1) <= 0 and getDifference(DateLeaving2,DateLeaving1) >= 0):
+        return False
+    return True
+def checkBookedRoom(DateEntry, DateLeaving, Bookedroom):
+    for clientBooked in Bookedroom["ListBookedClient"]:
+        if(checkBookedDay(DateEntry, DateLeaving,clientBooked["DateEntry"],clientBooked["Date of leaving"]) == False):
+            return False
+    return True
+def myFunc(ID):
+    return ID
 with open("accounts.json","r") as f:
     accounts = json.load(f)
 with open("hotel.json","r") as f:
@@ -47,6 +83,7 @@ def sendList(conn,list):
     msg = "end"
     conn.sendall(msg.encode(FORMAT))
 def handleLogin(msg,conn):
+    acc = {}
     while(msg != INVALID and msg != SUCCESS):
         username = conn.recv(1024).decode(FORMAT)
         conn.sendall(username.encode(FORMAT))
@@ -54,6 +91,7 @@ def handleLogin(msg,conn):
         conn.sendall(password.encode(FORMAT))
         for cont in accounts:
             if cont['username'] == username and cont['password'] == password :
+                acc = cont
                 msg = SUCCESS
                 break
         if(msg != SUCCESS):
@@ -66,11 +104,15 @@ def handleLogin(msg,conn):
         #     sendList(conn,list)
     conn.sendall(msg.encode(FORMAT))
     if(msg == SUCCESS):
+        conn.recv(1024)
+        conn.sendall(json.dumps(acc,indent=2).encode(FORMAT))
+        conn.recv(1024)
         list = []
         for hot in hotel:
             string_name = hot['name']
             list.append(string_name)
         sendList(conn,list)
+        
 def handleSignup(msg,msg2,msg3,msg4,checksignup,conn):
     while(msg != SUCCESS and msg != FORMATUSERNAME and msg2 != FORMATPASS and msg3 != DUPLICATEUSER and msg4 != FORMATBANKCODE):
         username = conn.recv(1024).decode(FORMAT)

@@ -17,7 +17,8 @@ FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
 FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
-listt = []
+listtHotel = []
+acc = {}
 def recvListt(client):
     list = []
     item = client.recv(1024).decode(FORMAT)
@@ -28,7 +29,7 @@ def recvListt(client):
     return list
 
 def inputhotel(hotellist):
-    for i in listt:
+    for i in listtHotel:
         hotellist.insert(END, "hotel " + i)
 
 class BookingPage(tk.Frame):
@@ -266,8 +267,14 @@ class App(tk.Tk):
             client.recv(1024)
             msg = client.recv(1024).decode(FORMAT)
             if msg == SUCCESS:
-                global listt
-                listt = recvListt(client)
+                client.sendall(msg.encode(FORMAT))
+                global acc
+                temp = client.recv(1024).decode(FORMAT)
+                client.sendall(temp.encode(FORMAT))
+                acc = json.dumps(temp)
+                print(acc)
+                global listtHotel
+                listtHotel = recvListt(client)
                 self.showPage(HomePage)
             else:
                 curFrame.label_notice["text"] = INVALID
