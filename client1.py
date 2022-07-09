@@ -17,8 +17,11 @@ FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
 FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
-listtHotel = []
+listt = []
 acc = {}
+roomlist=[]
+bedlist=[]
+
 def recvListt(client):
     list = []
     item = client.recv(1024).decode(FORMAT)
@@ -32,11 +35,46 @@ def inputhotel(hotellist):
     for i in listtHotel:
         hotellist.insert(END, "hotel " + i)
 
+def inputroom(roomlist):
+    for i in range(20):
+        roomlist.insert(END, "room " + i)
+
 class BookRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
-        title = tk.Label(self,text=" Book a hotel room")
-        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15,width =30)
+        title = tk.Label(self,text=" Book hotel room")
+        scrollbar = tk.Scrollbar(self,bg='white')
+        app.roomlist= tk.Canvas(self,bg='white',yscrollcommand = scrollbar.set)
+        roomtype = tk.Label(self,text="Room type")
+        bedtype = tk.Label(self,text="Bed type")
+        Describe = tk.Label(self,text="Describe")
+        Price = tk.Label(self,text="Price")
+        image = tk.Label(self,text="Image")
+        Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
+        Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
+        title.grid(row=0,column=0,columnspan=10)
+        self.grid_columnconfigure(0,minsize=50)
+        self.grid_columnconfigure(6,weight=1)
+
+        roomtype.grid(row=2,column=1,sticky="wesn")
+        bedtype.grid(row=2,column=2,sticky="wesn")
+        Describe.grid(row=2,column=3,sticky="wesn")
+        Price.grid(row=2,column=4,sticky="wesn")
+        image.grid(row=2,column=5,sticky="wesn")
+        i = 1
+        for i in range(5):
+            self.grid_columnconfigure(i,weight=1)
+
+        self.grid_rowconfigure(1,weight=1)
+        self.grid_rowconfigure(3,minsize=20)
+
+        app.roomlist.grid(row=4,column=1,sticky="wesn",columnspan=5)
+        self.grid_rowconfigure(5,minsize=20)
+        Home.grid(row=6,column=1)
+        Enter.grid(row=6,column=5)
+
+        self.grid_rowconfigure(7,weight=1)
+      
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -46,49 +84,98 @@ class BookingPage(tk.Frame):
         bedtype = tk.Label(self,text="Bed type: ")
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
+        self.check1 = tk.IntVar()
+        self.check2 = tk.IntVar()
+        self.check3 = tk.IntVar()
+        self.check4 = tk.IntVar()
+        self.check5 = tk.IntVar()
+        Stand = tk.Checkbutton(self,text="Standard Room",variable=self.check1)
+        Super = tk.Checkbutton(self,text="Superior Room",variable=self.check2)
+        Single = tk.Checkbutton(self,text="Single Bed",variable=self.check3)
+        Twin = tk.Checkbutton(self,text="Twin Bed",variable=self.check4)
+        Double = tk.Checkbutton(self,text="Double Bed",variable=self.check5)
+        def RoomBedlist():
+            roomlist.clear()
+            bedlist.clear()
+            if(self.check1.get()==1):
+                roomlist.append("Standard Room")
+            if(self.check2.get()==1):
+                roomlist.append("Superior Room")
+            if(self.check3.get()==1):
+                bedlist.append("Single Bed")
+            if(self.check4.get()==1):
+                bedlist.append("Twin Bed")
+            if(self.check5.get()==1):
+                bedlist.append("Double Bed")
+            for i in (self.check1,self.check2,self.check3,self.check4,self.check5):
+                i.set(0)
+            # check list
+            #print(roomlist,bedlist)
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
-        Enter= tk.Button(self,text="Enter")
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),RoomBedlist()))
         Note = tk.Label(self,text="Note: ")
-        name = tk.Entry(self,bg='white',width=30)
-        entry = tk.Entry(self,bg='white',width=30)
-        exit = tk.Entry(self,bg='white',width=30)
-        room = tk.Entry(self,bg='white',width=30)
-        bed = tk.Entry(self,bg='white',width=30)
+        name = tk.Entry(self,bg='white',width=30)        
         Enote = tk.Entry(self,bg='white',width=30)
+
+        slash = tk.Label(self,text="/")
+        slash1 = tk.Label(self,text="/")
+        slash2 = tk.Label(self,text="/")
+        slash3 = tk.Label(self,text="/")
+
+        dayentry = tk.Entry(self,bg = 'white',width=2)
+        monthentry = tk.Entry(self,bg = 'white',width=2)
+        yearentry = tk.Entry(self,bg = 'white',width=4)
+
+        dayexit = tk.Entry(self,bg = 'white',width=2)
+        monthexit = tk.Entry(self,bg = 'white',width=2)
+        yearexit = tk.Entry(self,bg = 'white',width=4)
 
         self.grid_rowconfigure(1,weight =1)
         self.grid_rowconfigure(15,weight =1)
         self.grid_columnconfigure(0,weight =1)
-        self.grid_columnconfigure(3,weight =1)
+        self.grid_columnconfigure(8,weight =1)
 
-        title.grid(row=0,column=1,columnspan=2)
+        title.grid(row=0,column=0,columnspan=10)
 
         hotelName.grid(row=2,column=1,sticky="w")
-        name.grid(row=2,column=2)
+        name.grid(row=2,column=2,columnspan=5)
         self.grid_rowconfigure(3,minsize=10)
 
         roomtype.grid(row=4,column=1,sticky="w")
-        room.grid(row=4,column=2)
+        Stand.grid(row=4,column=2)
+        Super.grid(row=4,column=3)
         self.grid_rowconfigure(5,minsize=10)
 
         bedtype.grid(row=6,column=1,sticky="w")
-        bed.grid(row=6,column=2)
+        Single.grid(row=6,column=2)
+        Double.grid(row=6,column=3)
+        Twin.grid(row=6,column=4)
         self.grid_rowconfigure(7,minsize=10)
 
         DateOfEntry.grid(row=8,column=1,sticky="w")
-        entry.grid(row=8,column=2)
         self.grid_rowconfigure(9,minsize=10)
-
         DateOfExit.grid(row=10,column=1,sticky="w")
-        exit.grid(row=10,column=2)
+        
+        dayentry.grid(row=8,column=2)
+        dayexit.grid(row=10,column=2)
+        slash.grid(row=8,column=3)
+        slash1.grid(row=10,column=3)
+                
+        monthentry.grid(row=8,column=4)
+        monthexit.grid(row=10,column=4)
+        slash2.grid(row=8,column=5)
+        slash3.grid(row=10,column=5)
+
+        yearentry.grid(row=8,column=6)
+        yearexit.grid(row=10,column=6)
         self.grid_rowconfigure(11,minsize=10)
 
         Note.grid(row=12,column=1,sticky="w")
-        Enote.grid(row=12,column=2)
+        Enote.grid(row=12,column=2,columnspan=5)
         self.grid_rowconfigure(13,minsize=20)
 
         Home.grid(row=14,column=1,sticky="w")
-        Enter.grid(row=14,column=2,sticky="e")
+        Enter.grid(row=14,column=7,sticky="e")
     
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
@@ -114,7 +201,7 @@ class HotelInfoPage(tk.Frame):
         
 
         Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),app.hotellist.delete(0,END)))
-        Enter= tk.Button(self,text="Enter")
+        Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
         
         title.grid(row=0,column=0,columnspan=10,sticky="we")
         self.grid_rowconfigure(1,minsize=10)
@@ -257,7 +344,7 @@ class App(tk.Tk):
         container.grid_columnconfigure(0,weight=1)
 
         self.frames = {}
-        for F in (StartPage,HomePage,SignUpPage,HotelInfoPage,BookingPage):
+        for F in (StartPage,HomePage,SignUpPage,HotelInfoPage,BookingPage,BookRoom):
             frame = F(container,self,client)
             frame.grid(row=0, column=0, sticky="nsew")
             self.frames[F] = frame
