@@ -17,11 +17,20 @@ FORMATPASS = 'wrong format pass'
 FORMATUSERNAME = 'wrong format username'
 FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
-listt = []
+FINDROOM = 'room information'
+FINDROOMBOOK = 'room book'
+listtHotelName = []
 acc = {}
 roomlist=[]
 bedlist=[]
-
+roomAvaiInfo = []
+roomAvaiBook = []
+def sendList(client,list):
+    for item in list:
+        client.sendall(item.encode(FORMAT))
+        client.recv(1024)
+    msg = "end"
+    client.sendall(msg.encode(FORMAT))
 def recvListt(client):
     list = []
     item = client.recv(1024).decode(FORMAT)
@@ -32,13 +41,16 @@ def recvListt(client):
     return list
 
 def inputhotel(hotellist):
-    for i in listtHotel:
+    for i in listtHotelName:
         hotellist.insert(END, "hotel " + i)
 
 def inputroom(roomlist):
     for i in range(20):
         roomlist.insert(END, "room " + i)
-
+def clickEventHotellist(event):
+    temp = app.hotellist.curselection()
+    if temp:
+        app.frames[HotelInfoPage].indexHotel = temp[0]
 class BookRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -50,7 +62,7 @@ class BookRoom(tk.Frame):
         Describe = tk.Label(self,text="Describe")
         Price = tk.Label(self,text="Price")
         image = tk.Label(self,text="Image")
-        Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
+        Home= tk.Button(self,text="Go back",command=lambda: app.showPage(HomePage))
         Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=50)
@@ -112,9 +124,9 @@ class BookingPage(tk.Frame):
             # check list
             #print(roomlist,bedlist)
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),RoomBedlist()))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),RoomBedlist(),self.BookedRoomList(client)))
         Note = tk.Label(self,text="Note: ")
-        name = tk.Entry(self,bg='white',width=30)        
+        self.name = tk.Entry(self,bg='white',width=30)        
         Enote = tk.Entry(self,bg='white',width=30)
 
         slash = tk.Label(self,text="/")
@@ -122,13 +134,13 @@ class BookingPage(tk.Frame):
         slash2 = tk.Label(self,text="/")
         slash3 = tk.Label(self,text="/")
 
-        dayentry = tk.Entry(self,bg = 'white',width=2)
-        monthentry = tk.Entry(self,bg = 'white',width=2)
-        yearentry = tk.Entry(self,bg = 'white',width=4)
+        self.dayentry = tk.Entry(self,bg = 'white',width=2)
+        self.monthentry = tk.Entry(self,bg = 'white',width=2)
+        self.yearentry = tk.Entry(self,bg = 'white',width=4)
 
-        dayexit = tk.Entry(self,bg = 'white',width=2)
-        monthexit = tk.Entry(self,bg = 'white',width=2)
-        yearexit = tk.Entry(self,bg = 'white',width=4)
+        self.dayexit = tk.Entry(self,bg = 'white',width=2)
+        self.monthexit = tk.Entry(self,bg = 'white',width=2)
+        self.yearexit = tk.Entry(self,bg = 'white',width=4)
 
         self.grid_rowconfigure(1,weight =1)
         self.grid_rowconfigure(15,weight =1)
@@ -138,7 +150,7 @@ class BookingPage(tk.Frame):
         title.grid(row=0,column=0,columnspan=10)
 
         hotelName.grid(row=2,column=1,sticky="w")
-        name.grid(row=2,column=2,columnspan=5)
+        self.name.grid(row=2,column=2,columnspan=5)
         self.grid_rowconfigure(3,minsize=10)
 
         roomtype.grid(row=4,column=1,sticky="w")
@@ -156,18 +168,18 @@ class BookingPage(tk.Frame):
         self.grid_rowconfigure(9,minsize=10)
         DateOfExit.grid(row=10,column=1,sticky="w")
         
-        dayentry.grid(row=8,column=2)
-        dayexit.grid(row=10,column=2)
+        self.dayentry.grid(row=8,column=2)
+        self.dayexit.grid(row=10,column=2)
         slash.grid(row=8,column=3)
         slash1.grid(row=10,column=3)
                 
-        monthentry.grid(row=8,column=4)
-        monthexit.grid(row=10,column=4)
+        self.monthentry.grid(row=8,column=4)
+        self.monthexit.grid(row=10,column=4)
         slash2.grid(row=8,column=5)
         slash3.grid(row=10,column=5)
 
-        yearentry.grid(row=8,column=6)
-        yearexit.grid(row=10,column=6)
+        self.yearentry.grid(row=8,column=6)
+        self.yearexit.grid(row=10,column=6)
         self.grid_rowconfigure(11,minsize=10)
 
         Note.grid(row=12,column=1,sticky="w")
@@ -176,6 +188,32 @@ class BookingPage(tk.Frame):
 
         Home.grid(row=14,column=1,sticky="w")
         Enter.grid(row=14,column=7,sticky="e")
+    def BookedRoomList(self,client):
+        hotelID = self.name.get()
+        global roomlist
+        global bedlist
+        roomtype = roomlist
+        bedtype = bedlist
+        DateEntry = [self.yearentry.get(),self.monthentry.get(),self.dayentry.get()]
+        DateLeaving = [self.yearexit.get(),self.monthexit.get(),self.dayexit.get()]
+        msg = FINDROOMBOOK
+        client.sendall(msg.encode(FORMAT)) 
+        sendList(client,DateEntry)
+        client.recv(1024) 
+        sendList(client,DateLeaving)
+        client.recv(1024)
+        client.sendall(hotelID.encode(FORMAT))
+        client.recv(1024)
+        # client.sendall(roomtype.encode(FORMAT))
+        sendList(client,roomtype)
+        client.recv(1024)
+        sendList(client,bedtype)
+        client.recv(1024)
+        global roomAvaiBook
+        roomAvaiBook = app.frames[HotelInfoPage].recvListroomAvailable(client)
+            # roomavai = json.loads(roomavai)
+        for rom in roomAvaiBook:        
+            print(rom,'\n')
     
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
@@ -184,24 +222,25 @@ class HotelInfoPage(tk.Frame):
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
         scrollbar = tk.Scrollbar(self,bg='white')
-        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15,width =30,yscrollcommand = scrollbar.set)
+        app.hotellist= tk.Listbox(self,bg='white',selectmode=SINGLE,height =15,width =30,exportselection=False,yscrollcommand = scrollbar.set)
         slash = tk.Label(self,text="/")
         slash1 = tk.Label(self,text="/")
         slash2 = tk.Label(self,text="/")
         slash3 = tk.Label(self,text="/")
 
-        dayentry = tk.Entry(self,bg = 'white',width=2)
-        monthentry = tk.Entry(self,bg = 'white',width=2)
-        yearentry = tk.Entry(self,bg = 'white',width=4)
+        self.dayentry = tk.Entry(self,bg = 'white',width=2)
+        self.monthentry = tk.Entry(self,bg = 'white',width=2)
+        self.yearentry = tk.Entry(self,bg = 'white',width=4)
 
-        dayexit = tk.Entry(self,bg = 'white',width=2)
-        monthexit = tk.Entry(self,bg = 'white',width=2)
-        yearexit = tk.Entry(self,bg = 'white',width=4)
+        self.dayexit = tk.Entry(self,bg = 'white',width=2)
+        self.monthexit = tk.Entry(self,bg = 'white',width=2)
+        self.yearexit = tk.Entry(self,bg = 'white',width=4)
+        self.indexHotel = None
         # listt = recvListt(client)
-        
+        app.hotellist.bind('<<ListboxSelect>>', clickEventHotellist)
 
-        Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),app.hotellist.delete(0,END)))
-        Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
+        Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),self.DeleteThing()))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),self.show()))
         
         title.grid(row=0,column=0,columnspan=10,sticky="we")
         self.grid_rowconfigure(1,minsize=10)
@@ -214,18 +253,18 @@ class HotelInfoPage(tk.Frame):
         DateOfEntry.grid(row=3,column=4)
         DateOfExit.grid(row=4,column=4)
 
-        dayentry.grid(row=3,column=5)
-        dayexit.grid(row=4,column=5)
+        self.dayentry.grid(row=3,column=5)
+        self.dayexit.grid(row=4,column=5)
         slash.grid(row=3,column=6)
         slash1.grid(row=4,column=6)
                 
-        monthentry.grid(row=3,column=7)
-        monthexit.grid(row=4,column=7)
+        self.monthentry.grid(row=3,column=7)
+        self.monthexit.grid(row=4,column=7)
         slash2.grid(row=3 ,column=8)
         slash3.grid(row=4,column=8)
 
-        yearentry.grid(row=3,column=9)
-        yearexit.grid(row=4,column=9)
+        self.yearentry.grid(row=3,column=9)
+        self.yearexit.grid(row=4,column=9)
 
         self.grid_columnconfigure(10, weight = 1)
         self.grid_rowconfigure(6, weight = 1)
@@ -234,7 +273,50 @@ class HotelInfoPage(tk.Frame):
         Home.grid(row=6,column=4)
         Enter.grid(row=6,column=9)
         self.grid_rowconfigure(7, weight = 1)
-       
+    def recvListroomAvailable(self,client):
+        list = []
+        item = client.recv(1024).decode(FORMAT)
+        while(item != "end"):
+            # item = json.loads(item)
+            list.append(json.loads(item))
+            client.sendall(item.encode(FORMAT))
+            item = client.recv(1024).decode(FORMAT)
+        return list
+    def DeleteThing(self):
+        app.hotellist.delete(0,END)
+        app.frames[HotelInfoPage].indexHotel = None
+    def InputHotelName(self,hotellist):
+        for i in listtHotelName:
+            hotellist.insert(END, "hotel " + i)
+    def show(self):
+        print(app.frames[HotelInfoPage].indexHotel)
+        Dayentry =self.dayentry.get()
+        Monthentry =self.monthentry.get()
+        Yearentry =self.yearentry.get()
+
+        Dayexit =self.dayexit.get()
+        Monthexit =self.monthexit.get()
+        Yearexit =self.yearexit.get()
+
+        # if(Dayentry == '' or Monthentry == '' or Yearentry == '' or Dayexit == '' or Monthexit == '' or Yearexit == ''):
+            # label notice
+        # if(app.frames[HotelInfoPage].indiceHotel == None):
+            #label notice
+        listentry = [Yearentry, Monthentry, Dayentry]
+        listexit = [Yearexit, Monthexit, Dayexit]
+        msg = FINDROOM
+        client.sendall(msg.encode(FORMAT)) 
+        sendList(client,listentry)
+        client.recv(1024) 
+        sendList(client,listexit)
+        client.recv(1024)
+        client.sendall(str(app.frames[HotelInfoPage].indexHotel).encode(FORMAT))
+        client.recv(1024)
+        global roomAvaiInfo
+        roomAvaiInfo = self.recvListroomAvailable(client)
+        # roomavai = json.loads(roomavai)
+        for rom in roomAvaiInfo:        
+            print(rom,'\n')   
 class SignUpPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
@@ -287,7 +369,7 @@ class HomePage(tk.Frame):
         appController.geometry("800x500")
         label_login = tk.Label(self,text="You have logging successfully")
         label_title = tk.Label(self, text = 'HOME PAGE')
-        hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), inputhotel(appController.hotellist)))
+        hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), app.frames[HotelInfoPage].InputHotelName(appController.hotellist)))
         hotel_book = tk.Button(self,text='Book a room in specific hotel',command=lambda:appController.showPage(BookingPage))
         hotel_removebooking = tk.Button(self,text='logout')
         blank=tk.Label(self,text="")
@@ -366,14 +448,15 @@ class App(tk.Tk):
             client.recv(1024)
             msg = client.recv(1024).decode(FORMAT)
             if msg == SUCCESS:
+                ms = 'ok'
                 client.sendall(msg.encode(FORMAT))
                 global acc
-                temp = client.recv(1024).decode(FORMAT)
-                client.sendall(temp.encode(FORMAT))
-                acc = json.dumps(temp)
+                temp = client.recv(10000).decode(FORMAT)
+                client.sendall(ms.encode(FORMAT))
+                acc = json.loads(temp)
                 print(acc)
-                global listtHotel
-                listtHotel = recvListt(client)
+                global listtHotelName
+                listtHotelName = recvListt(client)
                 self.showPage(HomePage)
             else:
                 curFrame.label_notice["text"] = INVALID

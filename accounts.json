@@ -3,7 +3,59 @@
     "username": "tuando",
     "password": "123",
     "bankcode": "1234567891",
-    "Booked room": []
+    "Booked room": [
+      {
+        "name" : "CLARA",
+        "listBooked" : [
+          {
+            "DateEntry": [2003,6,15],
+            "Date of leaving" :[2003,6,17],
+            "Booked":[0,1,4],
+            "Note":["haha"]
+          },
+          {
+            "DateEntry": [2003,6,15],
+            "Date of leaving" :[2003,6,17],
+            "Booked":[0,1,4],
+            "Note":["haha"]
+          }
+        ]
+      },
+      {
+        "name" : "ONIP",
+        "listBooked" : [
+          {
+            "DateEntry": [2003,6,15],
+            "Date of leaving" :[2003,6,17],
+            "Booked":[0,1,4],
+            "Note":["haha"]
+          },
+          {
+            "DateEntry": [2003,6,15],
+            "Date of leaving" :[2003,6,17],
+            "Booked":[0,1,4],
+            "Note":["haha"]
+          }
+        ]
+      },
+      {
+        "name" : "PROHIF",
+        "listBooked" : [
+          {
+            "DateEntry": [2003,6,15],
+            "Date of leaving" :[2003,6,17],
+            "Booked":[0,1,4],
+            "Note":["haha"]
+          },
+          {
+            "DateEntry": [2003,6,15],
+            "Date of leaving" :[2003,6,17],
+            "Booked":[0,1,4],
+            "Note":["haha"]
+          }
+        ]
+      }
+    ]
   },
   {
     "username": "tungthanh",
@@ -33,6 +85,12 @@
     "username": "jaytran",
     "password": "123",
     "bankcode": "1233445561",
+    "Booked room": []
+  },
+  {
+    "username": "jkey1",
+    "password": "123",
+    "bankcode": "1234567897",
     "Booked room": []
   }
 ]
