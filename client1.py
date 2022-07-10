@@ -1,7 +1,7 @@
 import tkinter as tk
 import socket
 import json
-from tkinter.constants import END, SINGLE
+from tkinter.constants import END, SINGLE, TRUE
 
 HOST = "127.0.0.1"
 SERVER_PORT = 63000
@@ -19,6 +19,7 @@ FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
 FINDROOM = 'room information'
 FINDROOMBOOK = 'room book'
+checkboxlist=[]
 listtHotelName = []
 acc = {}
 roomlist=[]
@@ -31,6 +32,7 @@ def sendList(client,list):
         client.recv(1024)
     msg = "end"
     client.sendall(msg.encode(FORMAT))
+
 def recvListt(client):
     list = []
     item = client.recv(1024).decode(FORMAT)
@@ -47,49 +49,77 @@ def inputhotel(hotellist):
 def inputroom(roomlist):
     for i in range(20):
         roomlist.insert(END, "room " + i)
+
 def clickEventHotellist(event):
     temp = app.hotellist.curselection()
     if temp:
         app.frames[HotelInfoPage].indexHotel = temp[0]
+
 class BookRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text=" Book hotel room")
         scrollbar = tk.Scrollbar(self,bg='white')
-        app.roomlist= tk.Canvas(self,bg='white',yscrollcommand = scrollbar.set)
-        roomtype = tk.Label(self,text="Room type")
-        bedtype = tk.Label(self,text="Bed type")
-        Describe = tk.Label(self,text="Describe")
-        Price = tk.Label(self,text="Price")
-        image = tk.Label(self,text="Image")
+
+        canvas=tk.Canvas(self,bg='red',yscrollcommand=scrollbar.set)
+        app.roomlist= tk.Frame(canvas,bg='white')
+        canvas.create_window(1,1,window= app.roomlist)
+        app.roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        roomtype = tk.Label(app.roomlist,text="Room type",bg='white')
+        bedtype = tk.Label(app.roomlist,text="Bed type",bg='white')
+        Describe = tk.Label(app.roomlist,text="Describe",bg='white')
+        Price = tk.Label(app.roomlist,text="Price",bg='white')
+        image = tk.Label(app.roomlist,text="Image",bg='white')
+
         Home= tk.Button(self,text="Go back",command=lambda: app.showPage(HomePage))
         Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
         title.grid(row=0,column=0,columnspan=10)
-        self.grid_columnconfigure(0,minsize=50)
-        self.grid_columnconfigure(6,weight=1)
+        self.grid_columnconfigure(0,minsize=25)
 
-        roomtype.grid(row=2,column=1,sticky="wesn")
-        bedtype.grid(row=2,column=2,sticky="wesn")
-        Describe.grid(row=2,column=3,sticky="wesn")
-        Price.grid(row=2,column=4,sticky="wesn")
-        image.grid(row=2,column=5,sticky="wesn")
-        i = 1
+        scrollbar.grid(row=2,column=2,sticky="sn")
+        scrollbar.config(command=canvas.yview)
+
+        self.grid_columnconfigure(3,minsize=25)
+        self.grid_rowconfigure(1,minsize=25)
+
+        self.grid_columnconfigure(1,weight=1)
+        self.grid_rowconfigure(2,weight=1)
+        canvas.grid(row=2,column=1,sticky="wesn")
+
+        roomtype.grid(row=0,column=0,sticky='nwse')
+        bedtype.grid(row=0,column=1,sticky='nwse')
+        Describe.grid(row=0,column=2,sticky='nwse')
+        Price.grid(row=0,column=3,sticky='nwse')
+        image.grid(row=0,column=4,sticky='nwse')
+        app.roomlist.grid_rowconfigure(1,minsize=20)
         for i in range(5):
-            self.grid_columnconfigure(i,weight=1)
+            app.roomlist.grid_columnconfigure(i,minsize=146)
 
-        self.grid_rowconfigure(1,weight=1)
+        for i in range(len(roomAvaiBook)):
+            var=tk.IntVar()
+            check= tk.Checkbutton(app.roomlist,text=roomAvaiBook[i]['Room Type'],variable=var,bg='yellow')
+            checkboxlist.append(var.get())
+            label= tk.Label(app.roomlist,text=roomAvaiBook[i]["Bed Type"],bg='white')
+            label1= tk.Label(app.roomlist,text=roomAvaiBook[i]["Describe"],wraplength=150,bg='white')
+            label2= tk.Label(app.roomlist,text=roomAvaiBook[i]["Price"],bg='white')
+            #label3= tk.Label(app.roomlist,bitmap=roomAvaiBook[i]["Image"])
+            check.grid(row=i+2,column=0,sticky='w')
+            label.grid(row=i+2,column=1,sticky='w')
+            label1.grid(row=i+2,column=2,sticky='w')
+            label2.grid(row=i+2,column=3)
+            #label3.grid(row=i+2,column=4,sticky='nwse')
         self.grid_rowconfigure(3,minsize=20)
 
-        app.roomlist.grid(row=4,column=1,sticky="wesn",columnspan=5)
-        self.grid_rowconfigure(5,minsize=20)
-        Home.grid(row=6,column=1)
-        Enter.grid(row=6,column=5)
+        Home.grid(row=4,column=1,sticky="w")
+        Enter.grid(row=4,column=1,sticky="e")
 
-        self.grid_rowconfigure(7,weight=1)
+        self.grid_rowconfigure(5,minsize=25) 
       
 class BookingPage(tk.Frame):
-    def __init__(self,parent,app,client):
+    def __init__(self,parent,app,client):       
         tk.Frame.__init__(self,parent)
+        notice = tk.Label(self,text='',bg='bisque')
         title = tk.Label(self,text=" Book a hotel room")
         hotelName = tk.Label(self,text="Hotel name/code: ")
         roomtype = tk.Label(self,text="Room type: ")
@@ -128,19 +158,20 @@ class BookingPage(tk.Frame):
         Note = tk.Label(self,text="Note: ")
         self.name = tk.Entry(self,bg='white',width=30)        
         Enote = tk.Entry(self,bg='white',width=30)
+        Date = tk.Frame(self)
 
-        slash = tk.Label(self,text="/")
-        slash1 = tk.Label(self,text="/")
-        slash2 = tk.Label(self,text="/")
-        slash3 = tk.Label(self,text="/")
+        slash = tk.Label(Date,text="/")
+        slash1 = tk.Label(Date,text="/")
+        slash2 = tk.Label(Date,text="/")
+        slash3 = tk.Label(Date,text="/")
 
-        self.dayentry = tk.Entry(self,bg = 'white',width=2)
-        self.monthentry = tk.Entry(self,bg = 'white',width=2)
-        self.yearentry = tk.Entry(self,bg = 'white',width=4)
+        self.dayentry = tk.Entry(Date,bg = 'white',width=2)
+        self.monthentry = tk.Entry(Date,bg = 'white',width=2)
+        self.yearentry = tk.Entry(Date,bg = 'white',width=4)
 
-        self.dayexit = tk.Entry(self,bg = 'white',width=2)
-        self.monthexit = tk.Entry(self,bg = 'white',width=2)
-        self.yearexit = tk.Entry(self,bg = 'white',width=4)
+        self.dayexit = tk.Entry(Date,bg = 'white',width=2)
+        self.monthexit = tk.Entry(Date,bg = 'white',width=2)
+        self.yearexit = tk.Entry(Date,bg = 'white',width=4)
 
         self.grid_rowconfigure(1,weight =1)
         self.grid_rowconfigure(15,weight =1)
@@ -148,6 +179,7 @@ class BookingPage(tk.Frame):
         self.grid_columnconfigure(8,weight =1)
 
         title.grid(row=0,column=0,columnspan=10)
+        notice.grid(row=1,column=0,columnspan=10,sticky='n')
 
         hotelName.grid(row=2,column=1,sticky="w")
         self.name.grid(row=2,column=2,columnspan=5)
@@ -163,6 +195,7 @@ class BookingPage(tk.Frame):
         Double.grid(row=6,column=3)
         Twin.grid(row=6,column=4)
         self.grid_rowconfigure(7,minsize=10)
+        Date.grid(row=8,column=2,rowspan=3,columnspan=3)
 
         DateOfEntry.grid(row=8,column=1,sticky="w")
         self.grid_rowconfigure(9,minsize=10)
@@ -188,6 +221,7 @@ class BookingPage(tk.Frame):
 
         Home.grid(row=14,column=1,sticky="w")
         Enter.grid(row=14,column=7,sticky="e")
+
     def BookedRoomList(self,client):
         hotelID = self.name.get()
         global roomlist
@@ -218,6 +252,7 @@ class BookingPage(tk.Frame):
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
+        notice = tk.Label(self,text='Cant leave blank space',bg='bisque')
         title = tk.Label(self,text="Finding hotel avaiable room")
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
@@ -265,6 +300,7 @@ class HotelInfoPage(tk.Frame):
 
         self.yearentry.grid(row=3,column=9)
         self.yearexit.grid(row=4,column=9)
+        notice.grid(row=5,column=4,columnspan=6)
 
         self.grid_columnconfigure(10, weight = 1)
         self.grid_rowconfigure(6, weight = 1)
@@ -317,6 +353,7 @@ class HotelInfoPage(tk.Frame):
         # roomavai = json.loads(roomavai)
         for rom in roomAvaiInfo:        
             print(rom,'\n')   
+
 class SignUpPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)
