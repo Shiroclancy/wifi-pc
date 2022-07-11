@@ -60,17 +60,9 @@ class BookRoom(tk.Frame):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text=" Book hotel room")
         scrollbar = tk.Scrollbar(self,bg='white')
-
-        canvas=tk.Canvas(self,bg='red',yscrollcommand=scrollbar.set)
-        app.roomlist= tk.Frame(canvas,bg='white')
-        canvas.create_window(1,1,window= app.roomlist)
-        app.roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-
-        roomtype = tk.Label(app.roomlist,text="Room type",bg='white')
-        bedtype = tk.Label(app.roomlist,text="Bed type",bg='white')
-        Describe = tk.Label(app.roomlist,text="Describe",bg='white')
-        Price = tk.Label(app.roomlist,text="Price",bg='white')
-        image = tk.Label(app.roomlist,text="Image",bg='white')
+        
+        app.canvas=tk.Canvas(self,yscrollcommand=scrollbar.set)
+        app.canvas.create_window(1,1,window= tk.Frame())     
 
         Home= tk.Button(self,text="Go back",command=lambda: app.showPage(HomePage))
         Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
@@ -78,43 +70,53 @@ class BookRoom(tk.Frame):
         self.grid_columnconfigure(0,minsize=25)
 
         scrollbar.grid(row=2,column=2,sticky="sn")
-        scrollbar.config(command=canvas.yview)
+        scrollbar.config(command=app.canvas.yview)
 
         self.grid_columnconfigure(3,minsize=25)
         self.grid_rowconfigure(1,minsize=25)
 
         self.grid_columnconfigure(1,weight=1)
         self.grid_rowconfigure(2,weight=1)
-        canvas.grid(row=2,column=1,sticky="wesn")
-
-        roomtype.grid(row=0,column=0,sticky='nwse')
-        bedtype.grid(row=0,column=1,sticky='nwse')
-        Describe.grid(row=0,column=2,sticky='nwse')
-        Price.grid(row=0,column=3,sticky='nwse')
-        image.grid(row=0,column=4,sticky='nwse')
-        app.roomlist.grid_rowconfigure(1,minsize=20)
-        for i in range(5):
-            app.roomlist.grid_columnconfigure(i,minsize=146)
-
-        for i in range(len(roomAvaiBook)):
-            var=tk.IntVar()
-            check= tk.Checkbutton(app.roomlist,text=roomAvaiBook[i]['Room Type'],variable=var,bg='yellow')
-            checkboxlist.append(var.get())
-            label= tk.Label(app.roomlist,text=roomAvaiBook[i]["Bed Type"],bg='white')
-            label1= tk.Label(app.roomlist,text=roomAvaiBook[i]["Describe"],wraplength=150,bg='white')
-            label2= tk.Label(app.roomlist,text=roomAvaiBook[i]["Price"],bg='white')
-            #label3= tk.Label(app.roomlist,bitmap=roomAvaiBook[i]["Image"])
-            check.grid(row=i+2,column=0,sticky='w')
-            label.grid(row=i+2,column=1,sticky='w')
-            label1.grid(row=i+2,column=2,sticky='w')
-            label2.grid(row=i+2,column=3)
-            #label3.grid(row=i+2,column=4,sticky='nwse')
+        app.canvas.grid(row=2,column=1,sticky="wesn")
+              
         self.grid_rowconfigure(3,minsize=20)
-
         Home.grid(row=4,column=1,sticky="w")
         Enter.grid(row=4,column=1,sticky="e")
 
         self.grid_rowconfigure(5,minsize=25) 
+def inputname(canvas):
+    print(roomAvaiBook)
+    app.roomlist= tk.Frame(canvas,bg='white')
+    app.roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
+    roomtype = tk.Label(app.roomlist,text="Room type",bg='white')
+    bedtype = tk.Label(app.roomlist,text="Bed type",bg='white')
+    Describe = tk.Label(app.roomlist,text="Describe",bg='white')
+    Price = tk.Label(app.roomlist,text="Price",bg='white')
+    image = tk.Label(app.roomlist,text="Image",bg='white')
+
+    roomtype.grid(row=0,column=0,sticky='nwse')
+    bedtype.grid(row=0,column=1,sticky='nwse')
+    Describe.grid(row=0,column=2,sticky='nwse')
+    Price.grid(row=0,column=3,sticky='nwse')
+    image.grid(row=0,column=4,sticky='nwse')
+    app.roomlist.grid_rowconfigure(1,minsize=20)
+    for i in range(5):
+            app.roomlist.grid_columnconfigure(i,minsize=146)
+    for i in range(len(roomAvaiBook)):
+        var=tk.IntVar()
+        check= tk.Checkbutton(app.roomlist,text=roomAvaiBook[i]['TypeRoom'],variable=var,bg='yellow')
+        checkboxlist.append(var.get())
+        label= tk.Label(app.roomlist,text=roomAvaiBook[i]["Bed"],bg='white')
+        label1= tk.Label(app.roomlist,text=roomAvaiBook[i]["Describe"],wraplength=150,bg='white')
+        label2= tk.Label(app.roomlist,text=roomAvaiBook[i]["Price"],bg='white')
+        #label3= tk.Label(app.roomlist,bitmap=roomAvaiBook[i]["Image"])
+        check.grid(row=i+2,column=0,sticky='w')
+        label.grid(row=i+2,column=1,sticky='w')
+        label1.grid(row=i+2,column=2,sticky='w')
+        label2.grid(row=i+2,column=3)
+        #label3.grid(row=i+2,column=4,sticky='nwse')
+    app.canvas.destroy()
+    app.canvas.create_window(1,1,window= app.roomlist)
       
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):       
@@ -154,7 +156,7 @@ class BookingPage(tk.Frame):
             # check list
             #print(roomlist,bedlist)
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),RoomBedlist(),self.BookedRoomList(client)))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),RoomBedlist(),self.BookedRoomList(client),inputname(app.canvas)))
         Note = tk.Label(self,text="Note: ")
         self.name = tk.Entry(self,bg='white',width=30)        
         Enote = tk.Entry(self,bg='white',width=30)
