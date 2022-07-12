@@ -26,6 +26,7 @@ acc = {}
 roomlist=[]
 bedlist=[]
 roomAvai = []
+Bookedroom = []
 def sendList(client,list):
     for item in list:
         client.sendall(item.encode(FORMAT))
@@ -73,7 +74,7 @@ class BookRoom(tk.Frame):
         app.canvas.create_window(1,1,window= tk.Frame())     
 
         Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),sendbookedlist()))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
 
@@ -93,7 +94,6 @@ class BookRoom(tk.Frame):
 
         self.grid_rowconfigure(5,minsize=25) 
 def inputname(canvas):
-    print(roomAvai)
     app.roomlist= tk.Frame(canvas,bg='white')
     app.roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
     roomtype = tk.Label(app.roomlist,text="Room type",bg='white')
@@ -110,10 +110,11 @@ def inputname(canvas):
     app.roomlist.grid_rowconfigure(1,minsize=20)
     for i in range(5):
             app.roomlist.grid_columnconfigure(i,minsize=146)
+    checkboxlist.clear()
     for i in range(len(roomAvai)):
         var=tk.IntVar()
         check= tk.Checkbutton(app.roomlist,text=roomAvai[i]['TypeRoom'],variable=var,bg='yellow')
-        checkboxlist.append(var.get())
+        checkboxlist.append(var)
         label= tk.Label(app.roomlist,text=roomAvai[i]["Bed"],bg='white')
         label1= tk.Label(app.roomlist,text=roomAvai[i]["Describe"],wraplength=150,bg='white')
         label2= tk.Label(app.roomlist,text=roomAvai[i]["Price"],bg='white')
@@ -125,6 +126,14 @@ def inputname(canvas):
         #label3.grid(row=i+2,column=4,sticky='nwse')
     app.canvas.delete("all")
     app.canvas.create_window(1,1,window= app.roomlist)
+def sendbookedlist():
+    j=-1
+    Bookedroom.clear()
+    for i in roomAvai:
+        j+=1
+        if(checkboxlist[j].get() == 1):
+            Bookedroom.append(i["IDroom"])
+    print(Bookedroom)
       
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):       
@@ -237,7 +246,7 @@ class BookingPage(tk.Frame):
             self.notice["text"] = 'Year is invalid'
             return False
         else:
-            if month < 0 or month >= 12:
+            if month < 0 or month > 12:
                 self.notice["text"] = 'Month is invalid'
                 return False
             else:
@@ -408,7 +417,7 @@ class HotelInfoPage(tk.Frame):
             self.notice["text"] = 'Year is invalid'
             return False
         else:
-            if month < 0 or month >= 12:
+            if month < 0 or month > 12:
                 self.notice["text"] = 'Month is invalid'
                 return False
             else:
