@@ -25,8 +25,7 @@ listtHotelName = []
 acc = {}
 roomlist=[]
 bedlist=[]
-roomAvaiInfo = []
-roomAvaiBook = []
+roomAvai = []
 def sendList(client,list):
     for item in list:
         client.sendall(item.encode(FORMAT))
@@ -94,7 +93,7 @@ class BookRoom(tk.Frame):
 
         self.grid_rowconfigure(5,minsize=25) 
 def inputname(canvas):
-    print(roomAvaiBook)
+    print(roomAvai)
     app.roomlist= tk.Frame(canvas,bg='white')
     app.roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
     roomtype = tk.Label(app.roomlist,text="Room type",bg='white')
@@ -111,14 +110,14 @@ def inputname(canvas):
     app.roomlist.grid_rowconfigure(1,minsize=20)
     for i in range(5):
             app.roomlist.grid_columnconfigure(i,minsize=146)
-    for i in range(len(roomAvaiBook)):
+    for i in range(len(roomAvai)):
         var=tk.IntVar()
-        check= tk.Checkbutton(app.roomlist,text=roomAvaiBook[i]['TypeRoom'],variable=var,bg='yellow')
+        check= tk.Checkbutton(app.roomlist,text=roomAvai[i]['TypeRoom'],variable=var,bg='yellow')
         checkboxlist.append(var.get())
-        label= tk.Label(app.roomlist,text=roomAvaiBook[i]["Bed"],bg='white')
-        label1= tk.Label(app.roomlist,text=roomAvaiBook[i]["Describe"],wraplength=150,bg='white')
-        label2= tk.Label(app.roomlist,text=roomAvaiBook[i]["Price"],bg='white')
-        #label3= tk.Label(app.roomlist,bitmap=roomAvaiBook[i]["Image"])
+        label= tk.Label(app.roomlist,text=roomAvai[i]["Bed"],bg='white')
+        label1= tk.Label(app.roomlist,text=roomAvai[i]["Describe"],wraplength=150,bg='white')
+        label2= tk.Label(app.roomlist,text=roomAvai[i]["Price"],bg='white')
+        #label3= tk.Label(app.roomlist,bitmap=roomAvai[i]["Image"])
         check.grid(row=i+2,column=0,sticky='w')
         label.grid(row=i+2,column=1,sticky='w')
         label1.grid(row=i+2,column=2,sticky='w')
@@ -320,11 +319,11 @@ class BookingPage(tk.Frame):
         client.recv(1024)
         sendList(client,bedtype)
         client.recv(1024)
-        global roomAvaiBook
-        roomAvaiBook = app.frames[HotelInfoPage].recvListroomAvailable(client)
+        global roomAvai
+        roomAvai = app.frames[HotelInfoPage].recvListroomAvailable(client)
         app.showPage(BookRoom)
             # roomavai = json.loads(roomavai)
-        for rom in roomAvaiBook:        
+        for rom in roomAvai:        
             print(rom,'\n')
         
 
@@ -354,7 +353,7 @@ class HotelInfoPage(tk.Frame):
         app.hotellist.bind('<<ListboxSelect>>', clickEventHotellist)
 
         Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),self.DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: (self.show()))
+        Enter= tk.Button(self,text="Enter",command=lambda: (self.show(),inputname(app.canvas)))
         
         title.grid(row=0,column=0,columnspan=10,sticky="we")
         self.grid_rowconfigure(1,minsize=10)
@@ -477,11 +476,11 @@ class HotelInfoPage(tk.Frame):
         client.recv(1024)
         client.sendall(str(app.frames[HotelInfoPage].indexHotel).encode(FORMAT))
         client.recv(1024)
-        global roomAvaiInfo
-        roomAvaiInfo = self.recvListroomAvailable(client)
+        global roomAvai
+        roomAvai = self.recvListroomAvailable(client)
         app.showPage(BookRoom)
         # roomavai = json.loads(roomavai)
-        for rom in roomAvaiInfo:        
+        for rom in roomAvai:        
             print(rom,'\n')   
 
 class SignUpPage(tk.Frame):
