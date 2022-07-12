@@ -591,13 +591,13 @@ class HomePage(tk.Frame):
         self.grid_rowconfigure(2,weight=1)
         self.grid_columnconfigure(0,weight=1)
 
-        hotel_removebooking.grid(row=3, column=1)
+        hotel_info.grid(row=3, column=1)
         self.grid_rowconfigure(4,weight=1)
 
-        hotel_info.grid(row=5, column=1)
+        hotel_book.grid(row=5, column=1)
         self.grid_rowconfigure(6,weight=1)
 
-        hotel_book.grid(row=7, column=1)
+        hotel_removebooking.grid(row=7, column=1)
         self.grid_rowconfigure(8,weight=1)
 
         btn_logout.grid(row=9, column=1)
