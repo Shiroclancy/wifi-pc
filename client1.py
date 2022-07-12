@@ -124,7 +124,7 @@ def inputname(canvas):
         label1.grid(row=i+2,column=2,sticky='w')
         label2.grid(row=i+2,column=3)
         #label3.grid(row=i+2,column=4,sticky='nwse')
-    app.canvas.destroy()
+    app.canvas.delete("all")
     app.canvas.create_window(1,1,window= app.roomlist)
       
 class BookingPage(tk.Frame):
