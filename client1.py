@@ -19,6 +19,7 @@ FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
 FINDROOM = 'room information'
 FINDROOMBOOK = 'room book'
+FAILFINDROOM = 'fail find room'
 checkboxlist=[]
 listtHotelName = []
 acc = {}
@@ -54,7 +55,15 @@ def clickEventHotellist(event):
     temp = app.hotellist.curselection()
     if temp:
         app.frames[HotelInfoPage].indexHotel = temp[0]
-
+def checkDateEntryLeaving(DateEntry,DateLeaving):
+    if(int(DateLeaving[0]) < int(DateEntry[0])):
+        return False
+    elif (int(DateLeaving[0]) == int(DateEntry[0])):
+        if(int(DateLeaving[1]) < int(DateEntry[1])):
+            return False
+        elif(int(DateLeaving[1]) == int(DateEntry[1]) and int(DateLeaving[2]) < int(DateEntry[2])):
+            return False
+    return True
 class BookRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
@@ -72,7 +81,7 @@ class BookRoom(tk.Frame):
         Price = tk.Label(app.roomlist,text="Price",bg='white')
         image = tk.Label(app.roomlist,text="Image",bg='white')
 
-        Home= tk.Button(self,text="Go back",command=lambda: app.showPage(HomePage))
+        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing()))
         Enter= tk.Button(self,text="Enter",command=lambda: app.showPage(BookRoom))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
@@ -119,7 +128,7 @@ class BookRoom(tk.Frame):
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):       
         tk.Frame.__init__(self,parent)
-        notice = tk.Label(self,text='',bg='bisque')
+        self.notice = tk.Label(self,text='',bg='bisque')
         title = tk.Label(self,text=" Book a hotel room")
         hotelName = tk.Label(self,text="Hotel name/code: ")
         roomtype = tk.Label(self,text="Room type: ")
@@ -154,10 +163,10 @@ class BookingPage(tk.Frame):
             # check list
             #print(roomlist,bedlist)
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),RoomBedlist(),self.BookedRoomList(client)))
+        Enter= tk.Button(self,text="Enter",command=lambda: (RoomBedlist(),self.BookedRoomList(client)))
         Note = tk.Label(self,text="Note: ")
         self.name = tk.Entry(self,bg='white',width=30)        
-        Enote = tk.Entry(self,bg='white',width=30)
+        self.Enote = tk.Entry(self,bg='white',width=30)
         Date = tk.Frame(self)
 
         slash = tk.Label(Date,text="/")
@@ -179,7 +188,7 @@ class BookingPage(tk.Frame):
         self.grid_columnconfigure(8,weight =1)
 
         title.grid(row=0,column=0,columnspan=10)
-        notice.grid(row=1,column=0,columnspan=10,sticky='n')
+        self.notice.grid(row=1,column=0,columnspan=10,sticky='n')
 
         hotelName.grid(row=2,column=1,sticky="w")
         self.name.grid(row=2,column=2,columnspan=5)
@@ -216,43 +225,111 @@ class BookingPage(tk.Frame):
         self.grid_rowconfigure(11,minsize=10)
 
         Note.grid(row=12,column=1,sticky="w")
-        Enote.grid(row=12,column=2,columnspan=5)
+        self.Enote.grid(row=12,column=2,columnspan=5)
         self.grid_rowconfigure(13,minsize=20)
 
         Home.grid(row=14,column=1,sticky="w")
         Enter.grid(row=14,column=7,sticky="e")
-
+    def checkdate(self,day,month,year):
+        day1 = 0
+        if year < 0:
+            self.notice["text"] = 'Year is invalid'
+            return False
+        else:
+            if month < 0 or month >= 12:
+                self.notice["text"] = 'Month is invalid'
+                return False
+            else:
+                if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
+                    day1 = 31
+                elif month == 4 or month == 6 or month == 9 or month == 11:
+                    day1 = 30
+                else:
+                    if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:
+                        day1 = 28
+                    else:
+                        day1 = 29
+                if day <= 0 or day > day1:
+                    self.notice["text"] = 'Day is invalid'
+                    return False
+                if(year < 2022):
+                    self.notice["text"] = 'today is 1/1/2022'
+                    return False
+        return True
     def BookedRoomList(self,client):
+        dayEntry = self.dayentry.get()
+        monthEntry = self.monthentry.get()
+        yearEntry = self.yearentry.get()
+        dayLeaving = self.dayexit.get()
+        monthLeaving = self.monthexit.get()
+        yearLeaving = self.yearexit.get()
         hotelID = self.name.get()
+        enote = self.Enote.get()
+        if(dayEntry == '' or monthEntry =='' or yearEntry =='' or dayLeaving == '' or monthLeaving == '' or yearLeaving == '' or hotelID == '' or enote == ''):
+            self.notice["text"] = 'fill your information in the blank field'
+            return
+        else:
+            self.notice["text"] = ''
+        if(dayEntry.isdigit() and monthEntry.isdigit() and yearEntry.isdigit() and dayLeaving.isdigit() and monthLeaving.isdigit() and yearLeaving.isdigit()):
+            self.notice["text"] = ''
+        else:
+            self.notice["text"] = 'Date is digit'
+            return
+        if(self.checkdate(int(dayEntry),int(monthEntry),int(yearEntry)) == False):
+            return
+        else:
+            self.notice["text"] = ''
+        if(self.checkdate(int(dayLeaving),int(monthLeaving),int(yearLeaving)) == False):
+            return
+        else:
+            self.notice["text"] = ''
         global roomlist
         global bedlist
+        if(len(roomlist) == 0 or len(bedlist) == 0):
+            self.notice["text"] = 'please choose type of room or type of bed you want'
+            return
+        else:
+            self.notice["text"] = ''
         roomtype = roomlist
         bedtype = bedlist
-        DateEntry = [self.yearentry.get(),self.monthentry.get(),self.dayentry.get()]
-        DateLeaving = [self.yearexit.get(),self.monthexit.get(),self.dayexit.get()]
+        DateEntry = [yearEntry,monthEntry,dayEntry]
+        DateLeaving = [yearLeaving,monthLeaving,dayLeaving]
+        if(checkDateEntryLeaving(DateEntry,DateLeaving) == False):
+            self.notice["text"] = 'error cause of leaving day and arrive day'
+            return
+        else:
+            self.notice["text"] = ""
         msg = FINDROOMBOOK
         client.sendall(msg.encode(FORMAT)) 
+        client.sendall(hotelID.encode(FORMAT))
+        # client.recv(1024)
+        checkhotel = client.recv(1024).decode(FORMAT)
+        client.sendall(checkhotel.encode(FORMAT))
+        if(checkhotel == FAILFINDROOM):
+            self.notice["text"] = 'There is no hotel'
+            return
+        else:
+            self.notice["text"] = ''
         sendList(client,DateEntry)
         client.recv(1024) 
         sendList(client,DateLeaving)
         client.recv(1024)
-        client.sendall(hotelID.encode(FORMAT))
-        client.recv(1024)
-        # client.sendall(roomtype.encode(FORMAT))
         sendList(client,roomtype)
         client.recv(1024)
         sendList(client,bedtype)
         client.recv(1024)
         global roomAvaiBook
         roomAvaiBook = app.frames[HotelInfoPage].recvListroomAvailable(client)
+        app.showPage(BookRoom)
             # roomavai = json.loads(roomavai)
         for rom in roomAvaiBook:        
             print(rom,'\n')
-    
+        
+
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
-        notice = tk.Label(self,text='Cant leave blank space',bg='bisque')
+        self.notice = tk.Label(self,text='Fill your information in the blank field',wraplength=150,bg='bisque')
         title = tk.Label(self,text="Finding hotel avaiable room")
         DateOfEntry = tk.Label(self, text = 'Date of entry: ')
         DateOfExit = tk.Label(self,text="Date of exit: ")
@@ -275,7 +352,7 @@ class HotelInfoPage(tk.Frame):
         app.hotellist.bind('<<ListboxSelect>>', clickEventHotellist)
 
         Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),self.DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),self.show()))
+        Enter= tk.Button(self,text="Enter",command=lambda: (self.show()))
         
         title.grid(row=0,column=0,columnspan=10,sticky="we")
         self.grid_rowconfigure(1,minsize=10)
@@ -300,7 +377,7 @@ class HotelInfoPage(tk.Frame):
 
         self.yearentry.grid(row=3,column=9)
         self.yearexit.grid(row=4,column=9)
-        notice.grid(row=5,column=4,columnspan=6)
+        self.notice.grid(row=5,column=4,columnspan=6)
 
         self.grid_columnconfigure(10, weight = 1)
         self.grid_rowconfigure(6, weight = 1)
@@ -324,6 +401,32 @@ class HotelInfoPage(tk.Frame):
     def InputHotelName(self,hotellist):
         for i in listtHotelName:
             hotellist.insert(END, "hotel " + i)
+    def checkdateInfo(self,day,month,year):
+        day1 = 0
+        if year < 0:
+            self.notice["text"] = 'Year is invalid'
+            return False
+        else:
+            if month < 0 or month >= 12:
+                self.notice["text"] = 'Month is invalid'
+                return False
+            else:
+                if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
+                    day1 = 31
+                elif month == 4 or month == 6 or month == 9 or month == 11:
+                    day1 = 30
+                else:
+                    if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:
+                        day1 = 28
+                    else:
+                        day1 = 29
+                if day <= 0 or day > day1:
+                    self.notice["text"] = 'Day is invalid'
+                    return False
+                if(year < 2022):
+                    self.notice["text"] = 'today is 1/1/2022'
+                    return False
+        return True
     def show(self):
         print(app.frames[HotelInfoPage].indexHotel)
         Dayentry =self.dayentry.get()
@@ -334,12 +437,36 @@ class HotelInfoPage(tk.Frame):
         Monthexit =self.monthexit.get()
         Yearexit =self.yearexit.get()
 
-        # if(Dayentry == '' or Monthentry == '' or Yearentry == '' or Dayexit == '' or Monthexit == '' or Yearexit == ''):
-            # label notice
-        # if(app.frames[HotelInfoPage].indiceHotel == None):
-            #label notice
+        if(Dayentry == '' or Monthentry == '' or Yearentry == '' or Dayexit == '' or Monthexit == '' or Yearexit == ''):
+            self.notice["text"] = "Fill your information in the blank field"
+            return
+        else:
+            self.notice["text"] = ""
+        if(Dayentry.isdigit() and Monthentry.isdigit() and Yearentry.isdigit() and Dayexit.isdigit() and Monthexit.isdigit() and Yearexit.isdigit()):
+            self.notice["text"] = ''
+        else:
+            self.notice["text"] = 'Date is digit'
+            return
+        if(self.checkdateInfo(int(Dayentry),int(Monthentry),int(Yearentry)) == False):
+            return
+        else:
+            self.notice["text"] = ''
+        if(self.checkdateInfo(int(Dayexit),int(Monthexit),int(Yearexit)) == False):
+            return
+        else:
+            self.notice["text"] = ''
+        if(self.indexHotel == None):
+            self.notice["text"] = "Choose hotel you want to see information"
+            return
+        else:
+            self.notice["text"] = ""
         listentry = [Yearentry, Monthentry, Dayentry]
         listexit = [Yearexit, Monthexit, Dayexit]
+        if(checkDateEntryLeaving(listentry,listexit) == False):
+            self.notice["text"] = 'error cause of leaving day and arrive day'
+            return
+        else:
+            self.notice["text"] = ""
         msg = FINDROOM
         client.sendall(msg.encode(FORMAT)) 
         sendList(client,listentry)
@@ -350,6 +477,7 @@ class HotelInfoPage(tk.Frame):
         client.recv(1024)
         global roomAvaiInfo
         roomAvaiInfo = self.recvListroomAvailable(client)
+        app.showPage(BookRoom)
         # roomavai = json.loads(roomavai)
         for rom in roomAvaiInfo:        
             print(rom,'\n')   

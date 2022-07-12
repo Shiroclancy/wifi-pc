@@ -17,6 +17,7 @@ FORMATBANKCODE = 'wrong format bankcode'
 DUPLICATEUSER = 'duplicate user name'
 FINDROOM = 'room information'
 FINDROOMBOOK = 'room book'
+FAILFINDROOM = 'fail find room'
 monthDays= [ 31, 28, 31, 30, 31, 30,31, 31, 30, 31, 30, 31 ]
 def countLeapYears(list):
    years = list[0]
@@ -178,25 +179,59 @@ def handleFindroomInfor(conn,ms):
     msg = 'ok'
     roomtype = None
     bedtype = None
+    indexHotel = None
+    if(ms == FINDROOMBOOK):
+        indexHotel = conn.recv(1024).decode(FORMAT)
+        # conn.sendall(indexHotel.encode(FORMAT))
+        if(indexHotel.isdigit() == True):
+            indexHotel = int(indexHotel)
+            if(indexHotel >= len(hotel)):
+                msg = FAILFINDROOM
+                conn.sendall(msg.encode(FORMAT))
+                conn.recv(1024)
+                return
+            else:
+                conn.sendall(msg.encode(FORMAT))
+                conn.recv(1024)
+        else:
+            check = True
+            for hot in hotel:
+                if (str(indexHotel).upper() == hot['name']):
+                    indexHotel = hot['IDhotel']
+                    check = False
+                    break
+            if(check == True):
+                msg = FAILFINDROOM
+                conn.sendall(msg.encode(FORMAT))
+                conn.recv(1024)
+                return
+            else:
+                conn.sendall(msg.encode(FORMAT))
+                conn.recv(1024)
+    msg = 'ok'
     DateEntry = recvListt(conn)
     DateEntry = [int(i) for i in DateEntry]
     conn.sendall(msg.encode(FORMAT))
     DateLeaving = recvListt(conn)
     DateLeaving = [int(i) for i in DateLeaving]
     conn.sendall(msg.encode(FORMAT))
-    indexHotel = conn.recv(1024).decode(FORMAT)
-    conn.sendall(indexHotel.encode(FORMAT))
+    if(ms == FINDROOM):
+        indexHotel = conn.recv(1024).decode(FORMAT)
+        conn.sendall(msg.encode(FORMAT))
+        indexHotel = int(indexHotel)
     if (ms == FINDROOMBOOK):
         roomtype = recvListt(conn)
         conn.sendall(msg.encode(FORMAT))
         bedtype = recvListt(conn)
         conn.sendall(msg.encode(FORMAT))
-    if(indexHotel.isdigit() == True):
-        indexHotel = int(indexHotel)
-    else:
-        for hot in hotel:
-            if (str(indexHotel).upper() == hot['name']):
-                indexHotel = hot['IDhotel']
+    # if(indexHotel.isdigit() == True):
+    #     indexHotel = int(indexHotel)
+    # else:
+    #     for hot in hotel:
+    #         if (str(indexHotel).upper() == hot['name']):
+    #             indexHotel = hot['IDhotel']
+    #         else:
+    #             msg = FAILFINDROOM
     listId = []
     if (ms == FINDROOM):
         for room in hotel[indexHotel]['BlankRoom']:
