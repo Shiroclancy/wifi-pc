@@ -19,12 +19,7 @@
       "Twin Bed": 50
     },
     "BlankRoom": [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5
+      0,1,2,3,4,5
     ],
     "Booked": [],
     "Standard Room": [
@@ -55,7 +50,7 @@
         "TypeRoom": "Superior Room",
         "Bed": "Double Bed",
         "Describe": "it's a beautifull room",
-        "Price": 0,
+        "Price": 130,
         "image": "tree.png"
       },
       {
@@ -63,7 +58,7 @@
         "TypeRoom": "Superior Room",
         "Bed": "Double Bed",
         "Describe": "it's a beautifull lovely room, with pretty view to the sea",
-        "Price": 0,
+        "Price": 130,
         "image": "tree.png"
       },
       {
@@ -71,7 +66,7 @@
         "TypeRoom": "Superior Room",
         "Bed": "Single Bed",
         "Describe": "it's a beautifull",
-        "Price": 0,
+        "Price": 125,
         "image": "tree.png"
       },
       {
@@ -156,7 +151,7 @@
         "TypeRoom": "Superior Room",
         "Bed": "Double Bed",
         "Describe": "it's a beautifull lovely room",
-        "Price": 0,
+        "Price": 135,
         "image": "tree.png"
       },
       {
@@ -164,7 +159,7 @@
         "TypeRoom": "Superior Room",
         "Bed": "Double Bed",
         "Describe": "it's a beautifull lovely room, with pretty view to the sea",
-        "Price": 0,
+        "Price": 135,
         "image": "tree.png"
       },
       {
@@ -172,7 +167,7 @@
         "TypeRoom": "Superior Room",
         "Bed": "Single Bed",
         "Describe": "it's a beautifull",
-        "Price": 0,
+        "Price": 130,
         "image": "tree.png"
       },
       {
@@ -180,7 +175,7 @@
         "TypeRoom": "Standard Room",
         "Bed": "Single Bed",
         "Describe": "it's lovely",
-        "Price": 0,
+        "Price": 105,
         "image": "tree.png"
       },
       {
@@ -188,7 +183,7 @@
         "TypeRoom": "Standard Room",
         "Bed": "Twin Bed",
         "Describe": "it's a beautifull lovely room, with pretty view to the sea",
-        "Price": 0,
+        "Price": 130,
         "image": "tree.png"
       },
       {
@@ -196,7 +191,7 @@
         "TypeRoom": "Standard Room",
         "Bed": "Twin Bed",
         "Describe": "it's a beautifull lovely room, with pretty view to the sea",
-        "Price": 0,
+        "Price": 130,
         "image": "tree.png"
       }
     ]

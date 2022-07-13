@@ -143,7 +143,7 @@ def handleSignup(msg,msg2,msg3,msg4,checksignup,conn):
         checkusername = Check_Username(username)
         checkpass = Check_Password(password)
         if(checkusername and checkpass and checkDuplicate and checkBankcode):
-            account = {"username": username, "password" : password,"bankcode": BankCode,"Booked room": {}}
+            account = {"username": username, "password" : password,"bankcode": BankCode,"Booked room": []}
             accounts.append(account)
             with open("accounts.json","w") as f:
                 json.dump(accounts,f,indent=2)
@@ -292,9 +292,11 @@ def handleBookRoom(conn):
         if cli['username'] == username:
             Bookroom = {'name': Hotelname,'Booked': {'DateEntry': DateEntry,
             'Date of leaving' :DateLeaving,'Booked':listIDroom},'price': price}
-            accounts[i]["Booked room"] = Bookroom
+            accounts[i]["Booked room"].append(Bookroom)
             with open("testaccount.json","w") as f:
                 json.dump(accounts,f,indent=2)
+            conn.sendall(json.dumps(Bookroom).encode(FORMAT))
+            conn.recv(1024)
         i+=1
     check = True
     for id in listIDroom:

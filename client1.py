@@ -152,12 +152,12 @@ class BookRoom(tk.Frame):
             indexHotell = str(app.frames[HotelInfoPage].indexHotel)
             client.sendall(indexHotell.encode(FORMAT))
             client.recv(1024)
-            Dayentry = curframee.dayentry.get()
-            Monthentry =curframee.monthentry.get()
-            Yearentry =curframee.yearentry.get()
-            Dayexit = curframee.dayexit.get()
-            Monthexit =curframee.monthexit.get()
-            Yearexit =curframee.yearexit.get()
+            Dayentry = app.frames[HotelInfoPage].dayentry.get()
+            Monthentry =app.frames[HotelInfoPage].monthentry.get()
+            Yearentry =app.frames[HotelInfoPage].yearentry.get()
+            Dayexit = app.frames[HotelInfoPage].dayexit.get()
+            Monthexit =app.frames[HotelInfoPage].monthexit.get()
+            Yearexit =app.frames[HotelInfoPage].yearexit.get()
             listentry = [Yearentry, Monthentry, Dayentry]
             listexit = [Yearexit, Monthexit, Dayexit]
             sendList(client,listentry)
@@ -180,7 +180,12 @@ class BookRoom(tk.Frame):
             client.recv(1024) 
             sendList(client,DateLeaving)
             client.recv(1024)
-        
+        msg = 'ok'
+        Bookedroomm = client.recv(1024).decode(FORMAT)
+        print(Bookedroomm)
+        client.sendall(msg.encode(FORMAT))
+        acc['Booked room'].append(json.loads(Bookedroomm))
+        print(acc)
             
 
 def inputname(canvas):
