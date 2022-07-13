@@ -2,15 +2,6 @@
   {
     "IDhotel": 0,
     "name": "CLARA",
-    "TypeRoom": [
-      "Standard Room",
-      "Superior Room"
-    ],
-    "TypeBed": [
-      "Single Bed",
-      "Double Bed",
-      "Twin Bed"
-    ],
     "Price": {
       "Standard Room": 50,
       "Superior Room": 100,
@@ -18,9 +9,7 @@
       "Double Bed": 30,
       "Twin Bed": 50
     },
-    "BlankRoom": [
-      0,1,2,3,4,5
-    ],
+    "BlankRoom": [0,1,2,3,4,5],
     "Booked": [],
     "Standard Room": [
       3,
@@ -98,15 +87,6 @@
   {
     "IDhotel": 1,
     "name": "PROHIF",
-    "TypeRoom": [
-      "Standard Room",
-      "Superior Room"
-    ],
-    "TypeBed": [
-      "Single Bed",
-      "Double Bed",
-      "Twin Bed"
-    ],
     "Price": {
       "Standard Room": 75,
       "Superior Room": 100,
@@ -199,15 +179,6 @@
   {
     "IDhotel": 2,
     "name": "ONIP",
-    "TypeRoom": [
-      "Standard Room",
-      "Superior Room"
-    ],
-    "TypeBed": [
-      "Single Bed",
-      "Double Bed",
-      "Twin Bed"
-    ],
     "Price": {
       "Standard Room": 100,
       "Superior Room": 150,
@@ -300,15 +271,6 @@
   {
     "IDhotel": 3,
     "name": "SANDRA",
-    "TypeRoom": [
-      "Standard Room",
-      "Superior Room"
-    ],
-    "TypeBed": [
-      "Single Bed",
-      "Double Bed",
-      "Twin Bed"
-    ],
     "Price": {
       "Standard Room": 85,
       "Superior Room": 105,

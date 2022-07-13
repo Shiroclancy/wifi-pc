@@ -19,6 +19,7 @@ FINDROOM = 'room information'
 FINDROOMBOOK = 'room book'
 FAILFINDROOM = 'fail find room'
 BOOKROOM = 'book room'
+ROOMBOOKED = 'room booked'
 monthDays= [ 31, 28, 31, 30, 31, 30,31, 31, 30, 31, 30, 31 ]
 def countLeapYears(list):
    years = list[0]
@@ -83,16 +84,16 @@ def Check_Password(password):
 def sendList(conn,list):
     for item in list:
         conn.sendall(item.encode(FORMAT))
-        conn.recv(1024)
+        conn.recv(2024)
     msg = "end"
     conn.sendall(msg.encode(FORMAT))
 def recvListt(conn):
     list = []
-    item = conn.recv(1024).decode(FORMAT)
+    item = conn.recv(2024).decode(FORMAT)
     while(item != "end"):
         list.append(item)
         conn.sendall(item.encode(FORMAT))
-        item = conn.recv(1024).decode(FORMAT)
+        item = conn.recv(2024).decode(FORMAT)
     return list
 def handleLogin(msg,conn):
     acc = {}
@@ -261,6 +262,9 @@ def handleFindroomInfor(conn,ms):
 def handleBookRoom(conn):
     msg = 'ok'
     conn.sendall(msg.encode(FORMAT))
+    msg2 = conn.recv(1024).decode(FORMAT)
+    if(msg2 == 'no'):
+        return
     listIDroom = recvListt(conn)
     listIDroom = [int(i) for i in listIDroom]
     username = conn.recv(1024).decode(FORMAT)
@@ -290,7 +294,7 @@ def handleBookRoom(conn):
     i = 0
     for cli in accounts:
         if cli['username'] == username:
-            Bookroom = {'name': Hotelname,'Booked': {'DateEntry': DateEntry,
+            Bookroom = {'IDhotel': indexHotel,'Booked': {'DateEntry': DateEntry,
             'Date of leaving' :DateLeaving,'Booked':listIDroom},'price': price}
             accounts[i]["Booked room"].append(Bookroom)
             with open("testaccount.json","w") as f:
@@ -316,8 +320,21 @@ def handleBookRoom(conn):
             hotel[indexHotel]['Booked'].append(newBookedroom)
     with open("testhotel.json","w") as f:
         json.dump(hotel,f,indent=2)
-
-
+def handleSendRoomBooked(conn):
+    msg = 'ok'
+    conn.sendall(msg.encode(FORMAT))
+    msg2 = conn.recv(1024).decode(FORMAT)
+    if(msg2 == 'no'):
+        return
+    listt1 = recvListt(conn)
+    listt1 = [json.loads(i) for i in listt1]
+    listinfo = []
+    for ele in listt1:
+        for i in ele['listroomBooked']:
+            room = hotel[ele['ID']]['ListRoom'][i]
+            listinfo.append(room)
+    listinfo = [json.dumps(i) for i in listinfo]
+    sendList(conn,listinfo)
 def handleClient(conn, addr):
     msg = None
     msg2 = None
@@ -339,6 +356,9 @@ def handleClient(conn, addr):
             handleFindroomInfor(conn,msg)
         elif(msg == BOOKROOM):
             handleBookRoom(conn)
+        elif(msg == ROOMBOOKED):
+            handleSendRoomBooked(conn)
+
         
 
     print("client address:",addr,"finished")

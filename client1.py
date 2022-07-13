@@ -29,20 +29,21 @@ bedlist=[]
 roomAvai = []
 Bookedroom = []
 curframee = None
+ROOMBOOKED = 'room booked'
 def sendList(client,list):
     for item in list:
         client.sendall(item.encode(FORMAT))
-        client.recv(1024)
+        client.recv(2024)
     msg = "end"
     client.sendall(msg.encode(FORMAT))
 
 def recvListt(client):
     list = []
-    item = client.recv(1024).decode(FORMAT)
+    item = client.recv(2024).decode(FORMAT)
     while(item != "end"):
         list.append(item)
         client.sendall(item.encode(FORMAT))
-        item = client.recv(1024).decode(FORMAT)
+        item = client.recv(2024).decode(FORMAT)
     return list
 
 def inputhotel(hotellist):
@@ -106,6 +107,28 @@ def sendremovedlist():
         if(checkboxlist[j].get() == 1):
             Bookedroom.append(i["IDroom"])
     print(Bookedroom)
+def roomBookedInfo(client):
+    msg = ROOMBOOKED
+    client.sendall(msg.encode(FORMAT))
+    client.recv(1024)
+    global acc
+    if(len(acc['Booked room']) != 0):
+        msg = 'ok'
+        client.sendall(msg.encode(FORMAT))
+        listt1 = []
+        for booked in acc['Booked room']:
+            rom = {'ID': booked['IDhotel'], 'listroomBooked' : booked['Booked']['Booked']}
+            listt1.append(rom)
+        # bookedrom = Bookedroom
+        listt1 = [json.dumps(i) for i in listt1]
+        sendList(client,listt1)
+        global roomAvai
+        roomAvai = recvListt(client)
+        roomAvai = [json.loads(i) for i in roomAvai]
+        print(roomAvai)
+    else:
+        msg = 'no'
+        client.sendall(msg.encode(FORMAT))
 
 class BookRoom(tk.Frame):
     def __init__(self,parent,app,client):
@@ -141,51 +164,57 @@ class BookRoom(tk.Frame):
         client.sendall(msg.encode(FORMAT))
         client.recv(1024)
         global Bookedroom
-        bookedrom = Bookedroom
-        bookedrom = [str(i) for i in bookedrom]
-        indexHotell = None
-        sendList(client,bookedrom)
-        client.sendall(acc['username'].encode(FORMAT))
-        client.recv(1024)
-        global curframee
-        if(curframee == HotelInfoPage):
-            indexHotell = str(app.frames[HotelInfoPage].indexHotel)
-            client.sendall(indexHotell.encode(FORMAT))
+        if(len(Bookedroom) != 0):
+            msg = 'ok'
+            client.sendall(msg.encode(FORMAT))
+            bookedrom = Bookedroom
+            bookedrom = [str(i) for i in bookedrom]
+            indexHotell = None
+            sendList(client,bookedrom)
+            client.sendall(acc['username'].encode(FORMAT))
             client.recv(1024)
-            Dayentry = app.frames[HotelInfoPage].dayentry.get()
-            Monthentry =app.frames[HotelInfoPage].monthentry.get()
-            Yearentry =app.frames[HotelInfoPage].yearentry.get()
-            Dayexit = app.frames[HotelInfoPage].dayexit.get()
-            Monthexit =app.frames[HotelInfoPage].monthexit.get()
-            Yearexit =app.frames[HotelInfoPage].yearexit.get()
-            listentry = [Yearentry, Monthentry, Dayentry]
-            listexit = [Yearexit, Monthexit, Dayexit]
-            sendList(client,listentry)
-            client.recv(1024)
-            sendList(client,listexit)
-            client.recv(1024)
-        elif(curframee == BookingPage):
-            indexHotell = app.frames[BookingPage].name.get()
-            client.sendall(indexHotell.encode(FORMAT))
-            client.recv(1024)
-            dayEntry = app.frames[BookingPage].dayentry.get()
-            monthEntry = app.frames[BookingPage].monthentry.get()
-            yearEntry = app.frames[BookingPage].yearentry.get()
-            dayLeaving = app.frames[BookingPage].dayexit.get()
-            monthLeaving = app.frames[BookingPage].monthexit.get()
-            yearLeaving = app.frames[BookingPage].yearexit.get()
-            DateEntry = [yearEntry,monthEntry,dayEntry]
-            DateLeaving = [yearLeaving,monthLeaving,dayLeaving]
-            sendList(client,DateEntry)
-            client.recv(1024) 
-            sendList(client,DateLeaving)
-            client.recv(1024)
-        msg = 'ok'
-        Bookedroomm = client.recv(1024).decode(FORMAT)
-        print(Bookedroomm)
-        client.sendall(msg.encode(FORMAT))
-        acc['Booked room'].append(json.loads(Bookedroomm))
-        print(acc)
+            global curframee
+            if(curframee == HotelInfoPage):
+                indexHotell = str(app.frames[HotelInfoPage].indexHotel)
+                client.sendall(indexHotell.encode(FORMAT))
+                client.recv(1024)
+                Dayentry = app.frames[HotelInfoPage].dayentry.get()
+                Monthentry =app.frames[HotelInfoPage].monthentry.get()
+                Yearentry =app.frames[HotelInfoPage].yearentry.get()
+                Dayexit = app.frames[HotelInfoPage].dayexit.get()
+                Monthexit =app.frames[HotelInfoPage].monthexit.get()
+                Yearexit =app.frames[HotelInfoPage].yearexit.get()
+                listentry = [Yearentry, Monthentry, Dayentry]
+                listexit = [Yearexit, Monthexit, Dayexit]
+                sendList(client,listentry)
+                client.recv(1024)
+                sendList(client,listexit)
+                client.recv(1024)
+            elif(curframee == BookingPage):
+                indexHotell = app.frames[BookingPage].name.get()
+                client.sendall(indexHotell.encode(FORMAT))
+                client.recv(1024)
+                dayEntry = app.frames[BookingPage].dayentry.get()
+                monthEntry = app.frames[BookingPage].monthentry.get()
+                yearEntry = app.frames[BookingPage].yearentry.get()
+                dayLeaving = app.frames[BookingPage].dayexit.get()
+                monthLeaving = app.frames[BookingPage].monthexit.get()
+                yearLeaving = app.frames[BookingPage].yearexit.get()
+                DateEntry = [yearEntry,monthEntry,dayEntry]
+                DateLeaving = [yearLeaving,monthLeaving,dayLeaving]
+                sendList(client,DateEntry)
+                client.recv(1024) 
+                sendList(client,DateLeaving)
+                client.recv(1024)
+            msg = 'ok'
+            Bookedroomm = client.recv(1024).decode(FORMAT)
+            print(Bookedroomm)
+            client.sendall(msg.encode(FORMAT))
+            acc['Booked room'].append(json.loads(Bookedroomm))
+            print(acc)
+        else:
+            msg = 'no'
+            client.sendall(msg.encode(FORMAT))
 def inputname(canvas,room):
     roomlist= tk.Frame(canvas,bg='white')
     roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
@@ -503,6 +532,7 @@ class HotelInfoPage(tk.Frame):
     def DeleteThing(self):
         app.hotellist.delete(0,END)
         app.frames[HotelInfoPage].indexHotel = None
+        roomAvai.clear()
     def InputHotelName(self,hotellist):
         for i in listtHotelName:
             hotellist.insert(END, "hotel " + i)
@@ -642,7 +672,7 @@ class HomePage(tk.Frame):
         label_title = tk.Label(self, text = 'HOME PAGE')
         hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), app.frames[HotelInfoPage].InputHotelName(appController.hotellist)))
         hotel_book = tk.Button(self,text='Book a room in specific hotel',command=lambda:appController.showPage(BookingPage))
-        hotel_removebooking = tk.Button(self,text='Remove booked hotel room',command=lambda: (appController.showPage(RemoveRoom),inputname(app.canvas1,roomAvai)))
+        hotel_removebooking = tk.Button(self,text='Remove booked hotel room',command=lambda: (roomBookedInfo(client),appController.showPage(RemoveRoom),inputname(app.canvas1,roomAvai)))
         btn_logout = tk.Button(self,text='Log out',command=lambda:appController.showPage(StartPage))
         label_title.grid(row=0, column=0, columnspan=3)
         label_login.grid(row=1, column=0, columnspan=3)
