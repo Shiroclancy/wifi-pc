@@ -86,18 +86,18 @@ class RemoveRoom(tk.Frame):
         scrollbar.grid(row=2,column=2,sticky="sn")
         scrollbar.config(command=app.canvas1.yview)
 
-#         self.grid_columnconfigure(3,minsize=25)
-#         self.grid_rowconfigure(1,minsize=25)
+        self.grid_columnconfigure(3,minsize=25)
+        self.grid_rowconfigure(1,minsize=25)
 
         self.grid_columnconfigure(1,weight=1)
         self.grid_rowconfigure(2,weight=1)
         app.canvas1.grid(row=2,column=1,sticky="wesn")
               
-#         self.grid_rowconfigure(3,minsize=20)
-#         Home.grid(row=4,column=1,sticky="w")
-#         Enter.grid(row=4,column=1,sticky="e")
+        self.grid_rowconfigure(3,minsize=20)
+        Home.grid(row=4,column=1,sticky="w")
+        Enter.grid(row=4,column=1,sticky="e")
 
-#         self.grid_rowconfigure(5,minsize=25) 
+        self.grid_rowconfigure(5,minsize=25) 
 def sendremovedlist():
     j=-1
     Bookedroom.clear()
@@ -655,7 +655,7 @@ class HomePage(tk.Frame):
         hotel_book.grid(row=5, column=1)
         self.grid_rowconfigure(6,weight=1)
 
-        # hotel_removebooking.grid(row=7, column=1)
+        hotel_removebooking.grid(row=7, column=1)
         self.grid_rowconfigure(8,weight=1)
 
         btn_logout.grid(row=9, column=1)
@@ -708,7 +708,7 @@ class App(tk.Tk):
         container.grid_columnconfigure(0,weight=1)
 
         self.frames = {}
-        for F in (StartPage,HomePage,SignUpPage,HotelInfoPage,BookingPage,BookRoom):
+        for F in (StartPage,HomePage,SignUpPage,HotelInfoPage,BookingPage,BookRoom,RemoveRoom):
             frame = F(container,self,client)
             frame.grid(row=0, column=0, sticky="nsew")
             self.frames[F] = frame
