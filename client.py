@@ -644,7 +644,7 @@ class SignUpPage(tk.Frame):
         self.grid_columnconfigure(3,weight =1)
 
         self.label_title.grid(row=0,column=1,columnspan=2)       
-        
+
         self.label_username.grid(row=3,column=1,sticky="w")
         self.entry_username.grid(row=3,column=2,padx=10)
         self.label_noticeUsername.grid(row=4,column=1,columnspan=2)
@@ -768,7 +768,7 @@ class App(tk.Tk):
                 ms = 'ok'
                 client.sendall(msg.encode(FORMAT))
                 global acc
-                temp = client.recv(10000).decode(FORMAT)
+                temp = client.recv(12000).decode(FORMAT)
                 client.sendall(ms.encode(FORMAT))
                 acc = json.loads(temp)
                 global listtHotelName

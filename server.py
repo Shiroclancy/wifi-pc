@@ -351,7 +351,7 @@ print("SERVER SIDE")
 print("server: ", HOST, SERVER_PORT)
 print("Waiting for Client")
 nClient = 0
-while (nClient < 3):
+while (nClient < 8):
     nClient += 1   
     try:
         conn, addr = s.accept()
