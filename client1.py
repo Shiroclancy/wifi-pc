@@ -652,7 +652,7 @@ class SignUpPage(tk.Frame):
         self.label_BankCode = tk.Label(self, text = 'Bank Code: ')
         self.entry_BankCode = tk.Entry(self,bg='light yellow',width=30)
         self.btn_signup = tk.Button(self,text='Sign up',command=lambda: appController.Signup(self,client))
-        self.btn_backlogin = tk.Button(self,text='Back to/nlogin',command=lambda: appController.showPage(StartPage))
+        self.btn_backlogin = tk.Button(self,text='Back to log in',command=lambda: appController.showPage(StartPage))
 
         self.grid_rowconfigure(1,weight =1)
         self.grid_rowconfigure(16,weight =1)
