@@ -20,6 +20,7 @@ DUPLICATEUSER = 'duplicate user name'
 FINDROOM = 'room information'
 FINDROOMBOOK = 'room book'
 FAILFINDROOM = 'fail find room'
+BOOKROOM = 'book room'
 checkboxlist=[]
 listtHotelName = []
 acc = {}
@@ -92,6 +93,50 @@ class BookRoom(tk.Frame):
         Enter.grid(row=4,column=1,sticky="e")
 
         self.grid_rowconfigure(5,minsize=25) 
+    def sendBookroomtoserver(self,client,curframe):
+        msg = BOOKROOM
+        client.sendall(msg.encode(FORMAT))
+        client.recv(1024)
+        global listIDroom
+        indexHotell = None
+        sendList(client,listIDroom)
+        client.sendall(acc['username'].encode(FORMAT))
+        client.recv(1024)
+        if(curframe == HotelInfoPage):
+            indexHotell = str(app.frames[HotelInfoPage].indexHotel)
+            client.sendall(indexHotell.encode(FORMAT))
+            client.recv(1024)
+            Dayentry = curframe.dayentry.get()
+            Monthentry =curframe.monthentry.get()
+            Yearentry =curframe.yearentry.get()
+            Dayexit = curframe.dayexit.get()
+            Monthexit =curframe.monthexit.get()
+            Yearexit =curframe.yearexit.get()
+            listentry = [Yearentry, Monthentry, Dayentry]
+            listexit = [Yearexit, Monthexit, Dayexit]
+            sendList(client,listentry)
+            client.recv(1024)
+            sendList(client,listexit)
+            client.recv(1024)
+        elif(curframe == BookingPage):
+            indexHotell = app.frames[BookingPage].name.get()
+            client.sendall(indexHotell.encode(FORMAT))
+            client.recv(1024)
+            dayEntry = self.dayentry.get()
+            monthEntry = self.monthentry.get()
+            yearEntry = self.yearentry.get()
+            dayLeaving = self.dayexit.get()
+            monthLeaving = self.monthexit.get()
+            yearLeaving = self.yearexit.get()
+            DateEntry = [yearEntry,monthEntry,dayEntry]
+            DateLeaving = [yearLeaving,monthLeaving,dayLeaving]
+            sendList(client,DateEntry)
+            client.recv(1024) 
+            sendList(client,DateLeaving)
+            client.recv(1024)
+        
+            
+
 def inputname(canvas):
     print(roomAvai)
     app.roomlist= tk.Frame(canvas,bg='white')
@@ -237,7 +282,7 @@ class BookingPage(tk.Frame):
             self.notice["text"] = 'Year is invalid'
             return False
         else:
-            if month < 0 or month >= 12:
+            if month < 0 or month > 12:
                 self.notice["text"] = 'Month is invalid'
                 return False
             else:
@@ -408,7 +453,7 @@ class HotelInfoPage(tk.Frame):
             self.notice["text"] = 'Year is invalid'
             return False
         else:
-            if month < 0 or month >= 12:
+            if month < 0 or month > 12:
                 self.notice["text"] = 'Month is invalid'
                 return False
             else:

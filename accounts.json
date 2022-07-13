@@ -3,59 +3,16 @@
     "username": "tuando",
     "password": "123",
     "bankcode": "1234567891",
-    "Booked room": [
-      {
+    "Booked room":{
         "name" : "CLARA",
-        "listBooked" : [
-          {
+        "Booked" :{
             "DateEntry": [2022,6,15],
             "Date of leaving" :[2022,6,17],
-            "Booked":[0,1,4],
-            "Note":["haha"]
+            "Booked":[0,4],
+            "Note":"haha"
           },
-          {
-            "DateEntry": [2022,6,15],
-            "Date of leaving" :[2022,6,17],
-            "Booked":[0,1,4],
-            "Note":["haha"]
-          }
-        ]
-      },
-      {
-        "name" : "ONIP",
-        "listBooked" : [
-          {
-            "DateEntry": [2022,6,15],
-            "Date of leaving" :[2022,6,17],
-            "Booked":[0,1,4],
-            "Note":["haha"]
-          },
-          {
-            "DateEntry": [2022,6,15],
-            "Date of leaving" :[2022,6,17],
-            "Booked":[0,1,4],
-            "Note":["haha"]
-          }
-        ]
-      },
-      {
-        "name" : "PROHIF",
-        "listBooked" : [
-          {
-            "DateEntry": [2022,6,15],
-            "Date of leaving" :[2022,6,17],
-            "Booked":[0,1,4],
-            "Note":["haha"]
-          },
-          {
-            "DateEntry": [2022,6,15],
-            "Date of leaving" :[2022,6,17],
-            "Booked":[0,1,4],
-            "Note":["haha"]
-          }
-        ]
+        "price": 130
       }
-    ]
   },
   {
     "username": "tungthanh",

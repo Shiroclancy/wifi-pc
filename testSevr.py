@@ -18,6 +18,7 @@ DUPLICATEUSER = 'duplicate user name'
 FINDROOM = 'room information'
 FINDROOMBOOK = 'room book'
 FAILFINDROOM = 'fail find room'
+BOOKROOM = 'book room'
 monthDays= [ 31, 28, 31, 30, 31, 30,31, 31, 30, 31, 30, 31 ]
 def countLeapYears(list):
    years = list[0]
@@ -142,7 +143,7 @@ def handleSignup(msg,msg2,msg3,msg4,checksignup,conn):
         checkusername = Check_Username(username)
         checkpass = Check_Password(password)
         if(checkusername and checkpass and checkDuplicate and checkBankcode):
-            account = {"username": username, "password" : password,"bankcode": BankCode,"Booked room": []}
+            account = {"username": username, "password" : password,"bankcode": BankCode,"Booked room": {}}
             accounts.append(account)
             with open("accounts.json","w") as f:
                 json.dump(accounts,f,indent=2)
@@ -257,6 +258,61 @@ def handleFindroomInfor(conn,ms):
     # listId = [str(i) for i in listId]
     # sendList(conn,listId)
     sendListRoomAvailable(conn,listId,indexHotel,hotel[indexHotel]['ListRoom'])
+def handleBookRoom(conn):
+    msg = 'ok'
+    conn.sendall(msg.encode(FORMAT))
+    listIDroom = recvListt(conn)
+    username = conn.recv(1024).decode(FORMAT)
+    conn.sendall(msg.encode(FORMAT))
+    Hotelname = conn.recv(1024).decode(FORMAT)
+    indexHotel = None
+    conn.sendall(msg.encode(FORMAT))
+    if(Hotelname.isdigit()):
+        indexHotel = int(Hotelname)
+        Hotelname = hotel[indexHotel]['name']
+    else:
+        Hotelname = str(Hotelname).upper()
+        for hot in hotel:
+            if hot['name'] == Hotelname:
+                indexHotel = hot['IDhotel']
+                break
+    DateEntry = recvListt(conn)
+    DateEntry = [int(i) for i in DateEntry]
+    conn.sendall(msg.encode(FORMAT))
+    DateLeaving = recvListt(conn)
+    DateLeaving = [int(i) for i in DateLeaving]
+    conn.sendall(msg.encode(FORMAT))
+    listroom = hotel[indexHotel]['ListRoom']
+    price = 0
+    for id in listIDroom:
+        price = price + hotel[indexHotel]['Price'][listroom[id]['TypeRoom']] + hotel[indexHotel]['Price'][listroom[id]['Bed']]
+    i = 0
+    for cli in accounts:
+        if cli['username'] == username:
+            Bookroom = {'name': Hotelname,'Booked': {'DateEntry': DateEntry,
+            'Date of leaving' :DateLeaving,'Booked':listIDroom},'price': price}
+            accounts[i]["Booked room"] = Bookroom
+            with open("accounts.json","w") as f:
+                json.dump(accounts,f,indent=2)
+        i+=1
+    check = True
+    for id in listIDroom:
+        check = True
+        i  = 0
+        for rom in hotel[indexHotel]['Booked']:
+            if(rom['IDroom'] == id):
+                user = {'username' : username, 'DateEntry': DateEntry, 'Date of leaving': DateLeaving}
+                hotel[indexHotel]['Booked'][i]['ListBookedClient'].append(user)
+                i+=1
+                check = False
+        if(check == True):
+            user = {'username' : username, 'DateEntry': DateEntry, 'Date of leaving': DateLeaving}
+            newBookedroom = {'IDroom':id,'ListBookedClient':[user]}
+            hotel[indexHotel]['Booked'].append(newBookedroom)
+            with open("accounts.json","w") as f:
+                json.dump(accounts,f,indent=2)
+
+
 def handleClient(conn, addr):
     msg = None
     msg2 = None
@@ -274,20 +330,11 @@ def handleClient(conn, addr):
             handleLogin(msg,conn)
         elif(msg == SIGNUP):
             handleSignup(msg,msg2,msg3,msg4,checksignup,conn)
-        if(msg == FINDROOM or msg == FINDROOMBOOK):
+        elif(msg == FINDROOM or msg == FINDROOMBOOK):
             handleFindroomInfor(conn,msg)
-        # conn.sendall(msg.encode(FORMAT))
-        # if checksignup == False :
-        #     conn.recv(1024)
-        #     if(msg2 == None):msg2 = 'a'
-        #     if(msg3 == None):msg3 = 'a'
-        #     if(msg4 == None):msg4 = 'a'
-        #     conn.sendall(msg2.encode(FORMAT))
-        #     conn.recv(1024)
-        #     conn.sendall(msg3.encode(FORMAT))
-        #     conn.recv(1024)
-        #     conn.sendall(msg4.encode(FORMAT))
-        #     conn.recv(1024)
+        elif(msg == BOOKROOM):
+            handleBookRoom(conn)
+        
 
     print("client address:",addr,"finished")
     conn.close()
