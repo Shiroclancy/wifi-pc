@@ -112,7 +112,7 @@ def sendremovedlist(notice,price):
         if(checkboxlist[j].get() == 1):
             Bookedroom.append(i["IDroom"])
     print(Bookedroom)
-    notice.config(text="You have remove booked room")
+    notice.config(text="                    You have remove booked room")
     price.config(text="Price: "+ str(total))
 
 class BookRoom(tk.Frame):
