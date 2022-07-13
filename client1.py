@@ -71,23 +71,23 @@ class RemoveRoom(tk.Frame):
         title = tk.Label(self,text=" Remove booked room")
         scrollbar = tk.Scrollbar(self,bg='white')
         
-        app.canvas=tk.Canvas(self,yscrollcommand=scrollbar.set)
-        app.canvas.create_window(1,1,window= tk.Frame())     
+        app.canvas1=tk.Canvas(self,yscrollcommand=scrollbar.set)
+        app.canvas1.create_window(1,1,window= tk.Frame())     
 
         Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),sendremovedlist()))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(RemoveRoom),sendremovedlist()))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
 
         scrollbar.grid(row=2,column=2,sticky="sn")
-        scrollbar.config(command=app.canvas.yview)
+        scrollbar.config(command=app.canvas1.yview)
 
         self.grid_columnconfigure(3,minsize=25)
         self.grid_rowconfigure(1,minsize=25)
 
         self.grid_columnconfigure(1,weight=1)
         self.grid_rowconfigure(2,weight=1)
-        app.canvas.grid(row=2,column=1,sticky="wesn")
+        app.canvas1.grid(row=2,column=1,sticky="wesn")
               
         self.grid_rowconfigure(3,minsize=20)
         Home.grid(row=4,column=1,sticky="w")
@@ -132,39 +132,40 @@ class BookRoom(tk.Frame):
         Enter.grid(row=4,column=1,sticky="e")
 
         self.grid_rowconfigure(5,minsize=25) 
-def inputname(canvas):
-    app.roomlist= tk.Frame(canvas,bg='white')
-    app.roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
-    roomtype = tk.Label(app.roomlist,text="Room type",bg='white')
-    bedtype = tk.Label(app.roomlist,text="Bed type",bg='white')
-    Describe = tk.Label(app.roomlist,text="Describe",bg='white')
-    Price = tk.Label(app.roomlist,text="Price",bg='white')
-    image = tk.Label(app.roomlist,text="Image",bg='white')
+def inputname(canvas,room):
+    roomlist= tk.Frame(canvas,bg='white')
+    roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
+    roomtype = tk.Label(roomlist,text="Room type",bg='white')
+    bedtype = tk.Label(roomlist,text="Bed type",bg='white')
+    Describe = tk.Label(roomlist,text="Describe",bg='white')
+    Price = tk.Label(roomlist,text="Price",bg='white')
+    image = tk.Label(roomlist,text="Image",bg='white')
 
     roomtype.grid(row=0,column=0,sticky='nwse')
     bedtype.grid(row=0,column=1,sticky='nwse')
     Describe.grid(row=0,column=2,sticky='nwse')
     Price.grid(row=0,column=3,sticky='nwse')
     image.grid(row=0,column=4,sticky='nwse')
-    app.roomlist.grid_rowconfigure(1,minsize=20)
+    roomlist.grid_rowconfigure(1,minsize=20)
     for i in range(5):
-            app.roomlist.grid_columnconfigure(i,minsize=146)
+            roomlist.grid_columnconfigure(i,minsize=146)
     checkboxlist.clear()
-    for i in range(len(roomAvai)):
+    for i in range(len(room)):
         var=tk.IntVar()
-        check= tk.Checkbutton(app.roomlist,text=roomAvai[i]['TypeRoom'],variable=var,bg='yellow')
+        check= tk.Checkbutton(roomlist,text=room[i]['TypeRoom'],variable=var,bg='yellow')
         checkboxlist.append(var)
-        label= tk.Label(app.roomlist,text=roomAvai[i]["Bed"],bg='white')
-        label1= tk.Label(app.roomlist,text=roomAvai[i]["Describe"],wraplength=150,bg='white')
-        label2= tk.Label(app.roomlist,text=roomAvai[i]["Price"],bg='white')
-        #label3= tk.Label(app.roomlist,bitmap=roomAvai[i]["Image"])
+        label= tk.Label(roomlist,text=room[i]["Bed"],bg='white')
+        label1= tk.Label(roomlist,text=room[i]["Describe"],wraplength=150,bg='white')
+        label2= tk.Label(roomlist,text=room[i]["Price"],bg='white')
+        #label3= tk.Label(roomlist,bitmap=roomAvai[i]["Image"])
         check.grid(row=i+2,column=0,sticky='w')
         label.grid(row=i+2,column=1,sticky='w')
         label1.grid(row=i+2,column=2,sticky='w')
         label2.grid(row=i+2,column=3)
         #label3.grid(row=i+2,column=4,sticky='nwse')
-    app.canvas.delete("all")
-    app.canvas.create_window(1,1,window= app.roomlist)
+    canvas.delete("all")
+    canvas.create_window(1, 1, window= roomlist)
+
 def sendbookedlist():
     j=-1
     Bookedroom.clear()
@@ -212,7 +213,7 @@ class BookingPage(tk.Frame):
             # check list
             #print(roomlist,bedlist)
         Home= tk.Button(self,text="Back to \n home page",command=lambda: app.showPage(HomePage))
-        Enter= tk.Button(self,text="Enter",command=lambda: (RoomBedlist(),self.BookedRoomList(client),inputname(app.canvas)))
+        Enter= tk.Button(self,text="Enter",command=lambda: (RoomBedlist(),self.BookedRoomList(client),inputname(app.canvas,roomAvai)))
         Note = tk.Label(self,text="Note: ")
         self.name = tk.Entry(self,bg='white',width=30)        
         self.Enote = tk.Entry(self,bg='white',width=30)
@@ -400,7 +401,7 @@ class HotelInfoPage(tk.Frame):
         app.hotellist.bind('<<ListboxSelect>>', clickEventHotellist)
 
         Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),self.DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: (self.show(),inputname(app.canvas)))
+        Enter= tk.Button(self,text="Enter",command=lambda: (self.show(),inputname(app.canvas,roomAvai)))
         
         title.grid(row=0,column=0,columnspan=10,sticky="we")
         self.grid_rowconfigure(1,minsize=10)
@@ -584,7 +585,7 @@ class HomePage(tk.Frame):
         label_title = tk.Label(self, text = 'HOME PAGE')
         hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), app.frames[HotelInfoPage].InputHotelName(appController.hotellist)))
         hotel_book = tk.Button(self,text='Book a room in specific hotel',command=lambda:appController.showPage(BookingPage))
-        hotel_removebooking = tk.Button(self,text='Remove booked hotel room',command=lambda:appController.showPage(RemoveRoom))
+        hotel_removebooking = tk.Button(self,text='Remove booked hotel room',command=lambda: (appController.showPage(RemoveRoom),inputname(app.canvas1,roomAvai)))
         btn_logout = tk.Button(self,text='Log out',command=lambda:appController.showPage(StartPage))
         label_title.grid(row=0, column=0, columnspan=3)
         label_login.grid(row=1, column=0, columnspan=3)
