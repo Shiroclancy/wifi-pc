@@ -127,13 +127,11 @@ def roomBookedInfo(client):
         for booked in acc['Booked room']:
             rom = {'ID': booked['IDhotel'], 'listroomBooked' : booked['Booked']['Booked']}
             listt1.append(rom)
-        # bookedrom = Bookedroom
         listt1 = [json.dumps(i) for i in listt1]
         sendList(client,listt1)
         global roomAvai
         roomAvai = recvListt(client)
         roomAvai = [json.loads(i) for i in roomAvai]
-        print(roomAvai)
     else:
         msg = 'no'
         client.sendall(msg.encode(FORMAT))
@@ -220,7 +218,6 @@ class BookRoom(tk.Frame):
                 client.recv(1024)
             msg = 'ok'
             Bookedroomm = client.recv(1024).decode(FORMAT)
-            print(Bookedroomm)
             client.sendall(msg.encode(FORMAT))
             acc['Booked room'].append(json.loads(Bookedroomm))
             Bookedroomm = json.loads(Bookedroomm)
@@ -228,7 +225,6 @@ class BookRoom(tk.Frame):
             total = Bookedroomm['price']
             notice.config(text="                You have booked the room")
             price.config(text="Price: "+ str(total))
-            print(acc)
         else:
             msg = 'no'
             client.sendall(msg.encode(FORMAT))
@@ -240,7 +236,6 @@ def sendbookedlist():
         j+=1
         if(checkboxlist[j].get() == 1):
             Bookedroom.append(i["IDroom"])
-    print(Bookedroom)
 
 def inputname(canvas,room):
     roomlist= tk.Frame(canvas,bg='white')
@@ -453,7 +448,6 @@ class BookingPage(tk.Frame):
         msg = FINDROOMBOOK
         client.sendall(msg.encode(FORMAT)) 
         client.sendall(hotelID.encode(FORMAT))
-        # client.recv(1024)
         checkhotel = client.recv(1024).decode(FORMAT)
         client.sendall(checkhotel.encode(FORMAT))
         if(checkhotel == FAILFINDROOM):
@@ -471,11 +465,7 @@ class BookingPage(tk.Frame):
         client.recv(1024)
         global roomAvai
         roomAvai = app.frames[HotelInfoPage].recvListroomAvailable(client)
-        # changeframe(BookingPage)
         app.showPage(BookRoom)
-            # roomavai = json.loads(roomavai)
-        for rom in roomAvai:        
-            print(rom,'\n')
         
 class HotelInfoPage(tk.Frame):
     def __init__(self,parent,app,client):
@@ -499,7 +489,6 @@ class HotelInfoPage(tk.Frame):
         self.monthexit = tk.Entry(self,bg = 'white',width=2)
         self.yearexit = tk.Entry(self,bg = 'white',width=4)
         self.indexHotel = None
-        # listt = recvListt(client)
         app.hotellist.bind('<<ListboxSelect>>', clickEventHotellist)
 
         Home= tk.Button(self,text="Back to \n home page",command=lambda: (app.showPage(HomePage),self.DeleteThing()))
@@ -580,7 +569,6 @@ class HotelInfoPage(tk.Frame):
                     return False
         return True
     def show(self):
-        print(app.frames[HotelInfoPage].indexHotel)
         Dayentry =self.dayentry.get()
         Monthentry =self.monthentry.get()
         Yearentry =self.yearentry.get()
@@ -629,11 +617,7 @@ class HotelInfoPage(tk.Frame):
         client.recv(1024)
         global roomAvai
         roomAvai = self.recvListroomAvailable(client)
-        # changeframe(HotelInfoPage)
-        app.showPage(BookRoom)
-        # roomavai = json.loads(roomavai)
-        for rom in roomAvai:        
-            print(rom,'\n')   
+        app.showPage(BookRoom) 
 
 class SignUpPage(tk.Frame):
     def __init__(self,parent,appController,client):
@@ -768,7 +752,6 @@ class App(tk.Tk):
     def Login(self,curFrame,client):
         username = curFrame.entry_username.get()
         password = curFrame.entry_password.get()
-        print(username,password)
 
         if (username == '' or password == ''):
             curFrame.label_notice["text"] = 'failed login'
@@ -788,10 +771,11 @@ class App(tk.Tk):
                 temp = client.recv(10000).decode(FORMAT)
                 client.sendall(ms.encode(FORMAT))
                 acc = json.loads(temp)
-                print(acc)
                 global listtHotelName
                 listtHotelName = recvListt(client)
                 self.showPage(HomePage)
+                global total
+                total = 0
             else:
                 curFrame.label_notice["text"] = INVALID
     def Signup(self,curFrame,client):
@@ -858,7 +842,6 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print("CLIENT SIDE")
 try:
     client.connect((HOST, SERVER_PORT))
-    # listt = recvListt(client)
 except:
     print("error")
 app = App(client)

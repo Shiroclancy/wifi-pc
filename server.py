@@ -54,8 +54,6 @@ def checkBookedRoom(DateEntry, DateLeaving, Bookedroom):
         if(checkBookedDay(DateEntry, DateLeaving,clientBooked["DateEntry"],clientBooked["Date of leaving"]) == False):
             return False
     return True
-def myFunc(ID):
-    return ID
 with open("accounts.json","r") as f:
     accounts = json.load(f)
 with open("hotel.json","r") as f:
