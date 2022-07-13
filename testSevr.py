@@ -56,9 +56,9 @@ def checkBookedRoom(DateEntry, DateLeaving, Bookedroom):
     return True
 def myFunc(ID):
     return ID
-with open("testaccount.json","r") as f:
+with open("accounts.json","r") as f:
     accounts = json.load(f)
-with open("testhotel.json","r") as f:
+with open("hotel.json","r") as f:
     hotel = json.load(f)
 def Check_Username(username):
     Alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -109,12 +109,6 @@ def handleLogin(msg,conn):
                 break
         if(msg != SUCCESS):
             msg = INVALID
-        # else:
-        #     list = []
-        #     for hot in hotel:
-        #         string_name = json.dumps(hot['name'],indent=2)
-        #         list.append(string_name)
-        #     sendList(conn,list)
     conn.sendall(msg.encode(FORMAT))
     if(msg == SUCCESS):
         conn.recv(1024)
@@ -226,22 +220,12 @@ def handleFindroomInfor(conn,ms):
         conn.sendall(msg.encode(FORMAT))
         bedtype = recvListt(conn)
         conn.sendall(msg.encode(FORMAT))
-    # if(indexHotel.isdigit() == True):
-    #     indexHotel = int(indexHotel)
-    # else:
-    #     for hot in hotel:
-    #         if (str(indexHotel).upper() == hot['name']):
-    #             indexHotel = hot['IDhotel']
-    #         else:
-    #             msg = FAILFINDROOM
     listId = []
     if (ms == FINDROOM):
         for room in hotel[indexHotel]['BlankRoom']:
-            # print(json.dumps(hotel["Hotel"][int(Hotel)-1]['ListRoom'][room],indent=2))
             listId.append(room)
         for room in hotel[indexHotel]['Booked']:
             if(checkBookedRoom(DateEntry, DateLeaving, room)):
-                # print(json.dumps(hotel["Hotel"][int(Hotel)-1]['ListRoom'][room["IDroom"]],indent=2))
                 listId.append(room["IDroom"])
     else:
         for rom in roomtype:
@@ -253,11 +237,8 @@ def handleFindroomInfor(conn,ms):
             for be in bedtype:
                 for room in hotel[indexHotel]['Booked']:
                     if((room['IDroom'] in hotel[indexHotel][rom] and room['IDroom'] in hotel[indexHotel][be]) and checkBookedRoom(DateEntry, DateLeaving, room)):
-                        # print(json.dumps(hotel["Hotel"][int(Hotel)-1]['ListRoom'][room["IDroom"]],indent=2))
                         listId.append(room["IDroom"])
     listId.sort()
-    # listId = [str(i) for i in listId]
-    # sendList(conn,listId)
     sendListRoomAvailable(conn,listId,indexHotel,hotel[indexHotel]['ListRoom'])
 def handleBookRoom(conn):
     msg = 'ok'
@@ -297,7 +278,7 @@ def handleBookRoom(conn):
             Bookroom = {'IDhotel': indexHotel,'Booked': {'DateEntry': DateEntry,
             'Date of leaving' :DateLeaving,'Booked':listIDroom},'price': price}
             accounts[i]["Booked room"].append(Bookroom)
-            with open("testaccount.json","w") as f:
+            with open("accounts.json","w") as f:
                 json.dump(accounts,f,indent=2)
             conn.sendall(json.dumps(Bookroom).encode(FORMAT))
             conn.recv(1024)
@@ -318,7 +299,7 @@ def handleBookRoom(conn):
             user = {'username' : username, 'DateEntry': DateEntry, 'Date of leaving': DateLeaving}
             newBookedroom = {'IDroom':id,'ListBookedClient':[user]}
             hotel[indexHotel]['Booked'].append(newBookedroom)
-    with open("testhotel.json","w") as f:
+    with open("hotel.json","w") as f:
         json.dump(hotel,f,indent=2)
 def handleSendRoomBooked(conn):
     msg = 'ok'
@@ -378,13 +359,8 @@ while (nClient < 3):
         conn, addr = s.accept()
         print("client address:",addr)
         print("conn:",conn.getsockname())
-        # list = []
-        # for hot in hotel:
-        #     string_name = hot['name']
-        #     list.append(string_name)
-        # sendList(conn,list)
         tr = threading.Thread(target = handleClient,args=(conn,addr))
-        tr.daemon = True
+        tr.daemon = False
         tr.start()
     except:
         print("error")

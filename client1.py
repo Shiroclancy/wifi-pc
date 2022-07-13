@@ -75,15 +75,15 @@ class RemoveRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text="Remove booked room")
-        notice = tk.Label(self,text="")
-        price = tk.Label(self,text="")
+        notice = tk.Label(self,text="All room you have booked")
+        self.price = tk.Label(self,text="")
         scrollbar = tk.Scrollbar(self,bg='white')
         
         app.canvas1=tk.Canvas(self,yscrollcommand=scrollbar.set)
         app.canvas1.create_window(1,1,window= tk.Frame())     
 
-        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing(),notice.config(text="")))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(RemoveRoom),sendremovedlist(notice,price)))
+        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing()))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(RemoveRoom)))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
 
@@ -97,24 +97,24 @@ class RemoveRoom(tk.Frame):
         self.grid_rowconfigure(2,weight=1)
         app.canvas1.grid(row=2,column=1,sticky="wesn")
         notice.grid(row=3,column=1,sticky="w")
-        price.grid(row=3,column=1,sticky="e")
+        self.price.grid(row=3,column=1,sticky="e")
               
         self.grid_rowconfigure(4,minsize=20)
         Home.grid(row=5,column=1,sticky="w")
         Enter.grid(row=5,column=1,sticky="e")
 
-        self.grid_rowconfigure(6,minsize=25) 
-              
-def sendremovedlist(notice,price):
-    j=-1
-    Bookedroom.clear()
-    for i in roomAvai:
-        j+=1
-        if(checkboxlist[j].get() == 1):
-            Bookedroom.append(i["IDroom"])
-    print(Bookedroom)
-    notice.config(text="                    You have remove booked room")
-    price.config(text="Price: "+ str(total))
+        self.grid_rowconfigure(6,minsize=25)
+
+# def sendremovedlist(notice,price):
+#     j=-1
+#     Bookedroom.clear()
+#     for i in roomAvai:
+#         j+=1
+#         if(checkboxlist[j].get() == 1):
+#             Bookedroom.append(i["IDroom"])
+#     print(Bookedroom)
+#     notice.config(text="                    You have remove booked room")
+#     price.config(text="Price: "+ str(total))
 def roomBookedInfo(client):
     msg = ROOMBOOKED
     client.sendall(msg.encode(FORMAT))
@@ -149,8 +149,8 @@ class BookRoom(tk.Frame):
         app.canvas=tk.Canvas(self,yscrollcommand=scrollbar.set)
         app.canvas.create_window(1,1,window= tk.Frame())     
 
-        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing(),notice.config(text="")))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),sendbookedlist(notice,price),self.sendBookroomtoserver(client)))
+        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing(),notice.config(text=""),price.config(text="")))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),sendbookedlist(),self.sendBookroomtoserver(client,notice,price)))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
 
@@ -171,7 +171,7 @@ class BookRoom(tk.Frame):
         Enter.grid(row=5,column=1,sticky="e")
 
         self.grid_rowconfigure(6,minsize=25) 
-    def sendBookroomtoserver(self,client):
+    def sendBookroomtoserver(self,client,notice,price):
         msg = BOOKROOM
         client.sendall(msg.encode(FORMAT))
         client.recv(1024)
@@ -223,11 +223,16 @@ class BookRoom(tk.Frame):
             print(Bookedroomm)
             client.sendall(msg.encode(FORMAT))
             acc['Booked room'].append(json.loads(Bookedroomm))
+            Bookedroomm = json.loads(Bookedroomm)
+            global total
+            total = Bookedroomm['price']
+            notice.config(text="                You have booked the room")
+            price.config(text="Price: "+ str(total))
             print(acc)
         else:
             msg = 'no'
             client.sendall(msg.encode(FORMAT))
-def sendbookedlist(notice,price):
+def sendbookedlist():
     j=-1
     global Bookedroom
     Bookedroom.clear()
@@ -236,8 +241,6 @@ def sendbookedlist(notice,price):
         if(checkboxlist[j].get() == 1):
             Bookedroom.append(i["IDroom"])
     print(Bookedroom)
-    notice.config(text="                You have booked the room")
-    price.config(text="Price: "+ str(total))
 
 def inputname(canvas,room):
     roomlist= tk.Frame(canvas,bg='white')
@@ -686,7 +689,7 @@ class HomePage(tk.Frame):
         label_title = tk.Label(self, text = 'HOME PAGE')
         hotel_info = tk.Button(self,text='Find hotel information',command=lambda:(appController.showPage(HotelInfoPage), app.frames[HotelInfoPage].InputHotelName(appController.hotellist)))
         hotel_book = tk.Button(self,text='Book a room in specific hotel',command=lambda:appController.showPage(BookingPage))
-        hotel_removebooking = tk.Button(self,text='Remove booked hotel room',command=lambda: (roomBookedInfo(client),appController.showPage(RemoveRoom),inputname(app.canvas1,roomAvai)))
+        hotel_removebooking = tk.Button(self,text='Remove booked hotel room',command=lambda: (self.countTotal(),app.frames[RemoveRoom].price.config(text= "Price " + str(total)),roomBookedInfo(client),appController.showPage(RemoveRoom),inputname(app.canvas1,roomAvai)))
         btn_logout = tk.Button(self,text='Log out',command=lambda:appController.showPage(StartPage))
         label_title.grid(row=0, column=0, columnspan=3)
         label_login.grid(row=1, column=0, columnspan=3)
@@ -705,7 +708,12 @@ class HomePage(tk.Frame):
         btn_logout.grid(row=9, column=1)
         self.grid_rowconfigure(10,weight=1)
         self.grid_columnconfigure(2,weight=1)
-
+    def countTotal(self):
+        if(len(acc['Booked room']) != 0):
+            global total
+            total = 0
+            for bok in acc['Booked room']:
+                total = total + bok['price']
 class StartPage(tk.Frame):
     def __init__(self,parent,appController,client):
         tk.Frame.__init__(self,parent)

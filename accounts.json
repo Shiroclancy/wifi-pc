@@ -3,16 +3,7 @@
     "username": "tuando",
     "password": "123",
     "bankcode": "1234567891",
-    "Booked room":{
-        "name" : "CLARA",
-        "Booked" :{
-            "DateEntry": [2022,6,15],
-            "Date of leaving" :[2022,6,17],
-            "Booked":[0,4],
-            "Note":"haha"
-          },
-        "price": 130
-      }
+    "Booked room": []
   },
   {
     "username": "tungthanh",
@@ -48,6 +39,12 @@
     "username": "jkey1",
     "password": "123",
     "bankcode": "1234567897",
+    "Booked room": []
+  },
+  {
+    "username": "huhuhihi",
+    "password": "1234",
+    "bankcode": "1234567893",
     "Booked room": []
   }
 ]
