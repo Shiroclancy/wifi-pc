@@ -72,14 +72,15 @@ def changeframe(curfram):
 class RemoveRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
-        title = tk.Label(self,text=" Remove booked room")
+        title = tk.Label(self,text="Remove booked room")
+        notice = tk.Label(self,text="")
         scrollbar = tk.Scrollbar(self,bg='white')
         
         app.canvas1=tk.Canvas(self,yscrollcommand=scrollbar.set)
         app.canvas1.create_window(1,1,window= tk.Frame())     
 
-        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(RemoveRoom),sendremovedlist()))
+        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing(),notice.config(text="")))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(RemoveRoom),sendremovedlist(notice)))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
 
@@ -92,13 +93,15 @@ class RemoveRoom(tk.Frame):
         self.grid_columnconfigure(1,weight=1)
         self.grid_rowconfigure(2,weight=1)
         app.canvas1.grid(row=2,column=1,sticky="wesn")
+        notice.grid(row=3,column=1)
               
-        self.grid_rowconfigure(3,minsize=20)
-        Home.grid(row=4,column=1,sticky="w")
-        Enter.grid(row=4,column=1,sticky="e")
+        self.grid_rowconfigure(4,minsize=20)
+        Home.grid(row=5,column=1,sticky="w")
+        Enter.grid(row=5,column=1,sticky="e")
 
-        self.grid_rowconfigure(5,minsize=25) 
-def sendremovedlist():
+        self.grid_rowconfigure(6,minsize=25) 
+              
+def sendremovedlist(notice):
     j=-1
     Bookedroom.clear()
     for i in roomAvai:
@@ -106,18 +109,20 @@ def sendremovedlist():
         if(checkboxlist[j].get() == 1):
             Bookedroom.append(i["IDroom"])
     print(Bookedroom)
+    notice.config(text="You have remove booked room")
 
 class BookRoom(tk.Frame):
     def __init__(self,parent,app,client):
         tk.Frame.__init__(self,parent)
         title = tk.Label(self,text=" Book hotel room")
+        notice = tk.Label(self,text="")
         scrollbar = tk.Scrollbar(self,bg='white')
         
         app.canvas=tk.Canvas(self,yscrollcommand=scrollbar.set)
         app.canvas.create_window(1,1,window= tk.Frame())     
 
-        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing()))
-        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),sendbookedlist(),self.sendBookroomtoserver(client)))
+        Home= tk.Button(self,text="Go back",command=lambda: (app.showPage(HomePage),app.frames[HotelInfoPage].DeleteThing(),notice.config(text="")))
+        Enter= tk.Button(self,text="Enter",command=lambda: (app.showPage(BookRoom),sendbookedlist(notice),self.sendBookroomtoserver(client)))
         title.grid(row=0,column=0,columnspan=10)
         self.grid_columnconfigure(0,minsize=25)
 
@@ -130,12 +135,13 @@ class BookRoom(tk.Frame):
         self.grid_columnconfigure(1,weight=1)
         self.grid_rowconfigure(2,weight=1)
         app.canvas.grid(row=2,column=1,sticky="wesn")
+        notice.grid(row=3,column=1)
               
-        self.grid_rowconfigure(3,minsize=20)
-        Home.grid(row=4,column=1,sticky="w")
-        Enter.grid(row=4,column=1,sticky="e")
+        self.grid_rowconfigure(4,minsize=20)
+        Home.grid(row=5,column=1,sticky="w")
+        Enter.grid(row=5,column=1,sticky="e")
 
-        self.grid_rowconfigure(5,minsize=25) 
+        self.grid_rowconfigure(6,minsize=25) 
     def sendBookroomtoserver(self,client):
         msg = BOOKROOM
         client.sendall(msg.encode(FORMAT))
@@ -186,6 +192,18 @@ class BookRoom(tk.Frame):
         client.sendall(msg.encode(FORMAT))
         acc['Booked room'].append(json.loads(Bookedroomm))
         print(acc)
+
+def sendbookedlist(notice):
+    j=-1
+    global Bookedroom
+    Bookedroom.clear()
+    for i in roomAvai:
+        j+=1
+        if(checkboxlist[j].get() == 1):
+            Bookedroom.append(i["IDroom"])
+    print(Bookedroom)
+    notice.config(text="You have booked the room")
+
 def inputname(canvas,room):
     roomlist= tk.Frame(canvas,bg='white')
     roomlist.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))  
@@ -219,17 +237,7 @@ def inputname(canvas,room):
         #label3.grid(row=i+2,column=4,sticky='nwse')
     canvas.delete("all")
     canvas.create_window(1, 1, window= roomlist)
-
-def sendbookedlist():
-    j=-1
-    global Bookedroom
-    Bookedroom.clear()
-    for i in roomAvai:
-        j+=1
-        if(checkboxlist[j].get() == 1):
-            Bookedroom.append(i["IDroom"])
-    print(Bookedroom)
-      
+     
 class BookingPage(tk.Frame):
     def __init__(self,parent,app,client):       
         tk.Frame.__init__(self,parent)
