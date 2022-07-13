@@ -9,7 +9,14 @@
       "Double Bed": 30,
       "Twin Bed": 50
     },
-    "BlankRoom": [0,1,2,3,4,5],
+    "BlankRoom": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
     "Booked": [],
     "Standard Room": [
       3,
