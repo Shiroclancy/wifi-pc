@@ -1,53 +1,83 @@
 [
-    {
-      "username": "tuando",
-      "password": "123",
-      "bankcode": "1234567891",
-      "Booked room":{
-          "name" : "CLARA",
-          "Booked" :{
-              "DateEntry": [2022,6,15],
-              "Date of leaving" :[2022,6,17],
-              "Booked":[0,4],
-              "Note":"haha"
-            },
-          "price": 130
-        }
-    },
-    {
-      "username": "tungthanh",
-      "password": "123",
-      "bankcode": "1234567892",
-      "Booked room": {}
-    },
-    {
-      "username": "hoahong",
-      "password": "123",
-      "bankcode": "1234567893",
-      "Booked room": {}
-    },
-    {
-      "username": "thanhoa",
-      "password": "123",
-      "bankcode": "1234567894",
-      "Booked room": {}
-    },
-    {
-      "username": "hoahongnguochuong",
-      "password": "123",
-      "bankcode": "1234567895",
-      "Booked room": {}
-    },
-    {
-      "username": "jaytran",
-      "password": "123",
-      "bankcode": "1233445561",
-      "Booked room": {}
-    },
-    {
-      "username": "jkey1",
-      "password": "123",
-      "bankcode": "1234567897",
-      "Booked room": {}
+  {
+    "username": "tuando",
+    "password": "123",
+    "bankcode": "1234567891",
+    "Booked room": {
+      "name": "CLARA",
+      "Booked": {
+        "DateEntry": [
+          2022,
+          6,
+          15
+        ],
+        "Date of leaving": [
+          2022,
+          6,
+          18
+        ],
+        "Booked": [
+          3,
+          4,
+          5
+        ]
+      },
+      "price": 275
     }
-  ]
+  },
+  {
+    "username": "tungthanh",
+    "password": "123",
+    "bankcode": "1234567892",
+    "Booked room": {}
+  },
+  {
+    "username": "hoahong",
+    "password": "123",
+    "bankcode": "1234567893",
+    "Booked room": {}
+  },
+  {
+    "username": "thanhoa",
+    "password": "123",
+    "bankcode": "1234567894",
+    "Booked room": {}
+  },
+  {
+    "username": "hoahongnguochuong",
+    "password": "123",
+    "bankcode": "1234567895",
+    "Booked room": {
+      "name": "CLARA",
+      "Booked": {
+        "DateEntry": [
+          2022,
+          7,
+          15
+        ],
+        "Date of leaving": [
+          2022,
+          7,
+          18
+        ],
+        "Booked": [
+          4,
+          5
+        ]
+      },
+      "price": 200
+    }
+  },
+  {
+    "username": "jaytran",
+    "password": "123",
+    "bankcode": "1233445561",
+    "Booked room": {}
+  },
+  {
+    "username": "jkey1",
+    "password": "123",
+    "bankcode": "1234567897",
+    "Booked room": {}
+  }
+]

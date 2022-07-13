@@ -55,9 +55,9 @@ def checkBookedRoom(DateEntry, DateLeaving, Bookedroom):
     return True
 def myFunc(ID):
     return ID
-with open("accounts.json","r") as f:
+with open("testaccount.json","r") as f:
     accounts = json.load(f)
-with open("hotel.json","r") as f:
+with open("testhotel.json","r") as f:
     hotel = json.load(f)
 def Check_Username(username):
     Alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -262,6 +262,7 @@ def handleBookRoom(conn):
     msg = 'ok'
     conn.sendall(msg.encode(FORMAT))
     listIDroom = recvListt(conn)
+    listIDroom = [int(i) for i in listIDroom]
     username = conn.recv(1024).decode(FORMAT)
     conn.sendall(msg.encode(FORMAT))
     Hotelname = conn.recv(1024).decode(FORMAT)
@@ -292,25 +293,27 @@ def handleBookRoom(conn):
             Bookroom = {'name': Hotelname,'Booked': {'DateEntry': DateEntry,
             'Date of leaving' :DateLeaving,'Booked':listIDroom},'price': price}
             accounts[i]["Booked room"] = Bookroom
-            with open("accounts.json","w") as f:
+            with open("testaccount.json","w") as f:
                 json.dump(accounts,f,indent=2)
         i+=1
     check = True
     for id in listIDroom:
         check = True
-        i  = 0
+        i = 0
+        if(id in hotel[indexHotel]['BlankRoom']):
+            hotel[indexHotel]['BlankRoom'].remove(id)
         for rom in hotel[indexHotel]['Booked']:
             if(rom['IDroom'] == id):
                 user = {'username' : username, 'DateEntry': DateEntry, 'Date of leaving': DateLeaving}
                 hotel[indexHotel]['Booked'][i]['ListBookedClient'].append(user)
-                i+=1
                 check = False
+            i+=1
         if(check == True):
             user = {'username' : username, 'DateEntry': DateEntry, 'Date of leaving': DateLeaving}
             newBookedroom = {'IDroom':id,'ListBookedClient':[user]}
             hotel[indexHotel]['Booked'].append(newBookedroom)
-            with open("accounts.json","w") as f:
-                json.dump(accounts,f,indent=2)
+    with open("testhotel.json","w") as f:
+        json.dump(hotel,f,indent=2)
 
 
 def handleClient(conn, addr):
